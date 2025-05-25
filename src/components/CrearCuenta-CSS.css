@@ -1,0 +1,170 @@
+.register-root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+
+.register-form {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 28px 26px 20px 26px;
+  width: 100%;
+  max-width: 350px;
+  box-shadow: 0 4px 24px #0001;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.register-title {
+  margin: 0 0 18px 0;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: -1px;
+  color: #181818;
+}
+
+/* Toggle para usuario/entrenador */
+.register-toggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+.toggle-btn {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 7px;
+  border: 1.5px solid #222;
+  background: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #222;
+  transition: background .13s, color .13s;
+}
+.toggle-btn.active,
+.toggle-btn:hover {
+  background: #222;
+  color: #fff;
+}
+
+.register-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.register-group label {
+  font-size: 0.98rem;
+  font-weight: 500;
+  color: #111;
+  margin-bottom: 3px;
+  margin-left: 1px;
+}
+
+.register-input,
+.register-group select {
+  padding: 7px 8px;
+  border-radius: 6px;
+  border: 1px solid #eaeaea;
+  background: #fafafa;
+  font-size: 0.98rem;
+  margin-bottom: 2px;
+  outline: none;
+  transition: border 0.14s;
+  color: #222;
+  appearance: none;          /* Elimina el estilo por defecto del select */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Flechita custom para el select */
+.register-group select {
+  width: 100%;
+  background-image: url("data:image/svg+xml;charset=UTF-8,<svg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M6 8L0.803847 0.5L11.1962 0.5L6 8Z' fill='%23888'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 15px 9px;
+  cursor: pointer;
+}
+
+.register-input:focus,
+.register-group select:focus {
+  border: 1.5px solid #222;
+  background: #fff;
+}
+
+.register-btn {
+  width: 100%;
+  padding: 9px 0;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 7px;
+  cursor: pointer;
+  transition: background 0.14s;
+}
+.register-btn:hover {
+  background: #222;
+}
+
+.register-error {
+  color: #d00;
+  text-align: center;
+  margin-top: 5px;
+  font-size: 0.97rem;
+}
+.register-success {
+  color: #108b0d;
+  text-align: center;
+  margin-top: 5px;
+  font-size: 0.97rem;
+}
+
+.idiomas-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 3px;
+}
+
+.idioma-btn {
+  display: flex;
+  align-items: center;
+  padding: 6px 13px;
+  border: 1.5px solid #ddd;
+  border-radius: 7px;
+  background: #fafafa;
+  font-size: 0.99rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .13s;
+  color: #222;
+  user-select: none;
+}
+.idioma-btn.selected,
+.idioma-btn:hover {
+  border: 1.5px solid #222;
+  background: #f6f6f6;
+}
+.idioma-btn input[type="checkbox"] {
+  display: none;
+}
+
+
+
+/* Responsive */
+@media (max-width: 650px) {
+  .register-form {
+    max-width: 97vw;
+    padding: 18px 6vw 16px 6vw;
+  }
+}

@@ -1,0 +1,178 @@
+.landing-main {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 46px 12px 0 12px;
+  text-align: center;
+}
+
+.landing-title {
+  font-size: 3.3rem;
+  font-weight: 800;
+  margin: 0;
+  color: #171717;
+  letter-spacing: -2px;
+}
+
+.landing-subtitle {
+  font-size: 1.37rem;
+  margin: 13px 0 30px 0;
+  color: #444;
+  font-weight: 500;
+}
+
+.landing-buttons {
+  margin-bottom: 32px;
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.landing-btn {
+  background: #f6f6f6;
+  border: 1.5px solid #222;
+  border-radius: 7px;
+  color: #222;
+  padding: 12px 23px;
+  font-size: 1.07rem;
+  font-weight: 600;
+  margin: 0 3px 7px 3px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.landing-btn.secondary {
+  background: #fff;
+  border: 1.5px solid #aaa;
+  color: #555;
+}
+
+.landing-image-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.landing-image {
+  width: 92%;
+  max-width: 2000px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 12px #0001;
+  object-fit: cover;
+}
+
+.landing-trainers {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto 34px auto;
+  background: #fff;
+  padding: 8px 0 38px 0;
+}
+.landing-trainers-title {
+  font-weight: 700;
+  font-size: 1.53rem;
+  margin-left: 15px;
+  margin-bottom: 0;
+  text-align: left;
+}
+.landing-trainers-cards {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+.trainer-card {
+  border: 1.7px solid #eee;
+  border-radius: 13px;
+  padding: 18px;
+  min-width: 240px;
+  max-width: 260px;
+  box-shadow: 0 1px 7px #bbb3;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+.trainer-rating {
+  color: #F6C948;
+  font-size: 22px;
+  margin-bottom: 7px;
+}
+.trainer-name {
+  font-weight: 700;
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+.trainer-presentacion {
+  color: #555;
+  font-size: 15px;
+  margin-bottom: 9px;
+}
+.trainer-zona {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 0;
+}
+.trainer-idiomas {
+  font-size: 13px;
+  color: #aaa;
+}
+
+/* -------- Responsive -------- */
+@media (max-width: 650px) {
+  .landing-main {
+    max-width: 99vw;
+    padding: 20px 2vw 0 2vw;
+  }
+  .landing-title {
+    font-size: 2rem;
+  }
+  .landing-subtitle {
+    font-size: 1.03rem;
+  }
+  .landing-image {
+    width: 100%;
+    max-width: 99vw;
+    border-radius: 13px;
+    margin-bottom: 11px;
+  }
+  .landing-trainers {
+    max-width: 99vw;
+    padding: 8px 2vw 30px 2vw;
+  }
+  .landing-trainers-title {
+    font-size: 1.11rem;
+    margin-left: 2vw;
+  }
+  .landing-trainers-cards {
+    gap: 10px;
+    justify-content: center;
+  }
+  .trainer-card {
+    min-width: 140px;
+    max-width: 98vw;
+    padding: 10px 7px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Ultra compact para pantallas menores a 410px */
+@media (max-width: 410px) {
+  .landing-title {
+    font-size: 1.16rem;
+  }
+  .landing-subtitle {
+    font-size: 0.93rem;
+  }
+  .trainer-name,
+  .trainer-presentacion {
+    font-size: 0.97rem;
+  }
+  .landing-btn {
+    font-size: 0.9rem;
+    padding: 10px 11px;
+  }
+}
