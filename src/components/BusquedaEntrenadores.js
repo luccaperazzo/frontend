@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Layout from "./Layout";
 import "./BusquedaEntrenadores.css";
+import { useNavigate } from "react-router-dom";
 
 const categorias = ['Entrenamiento', 'Nutrición', 'Consultoría'];
 const zonas = [
@@ -33,6 +34,7 @@ const BusquedaEntrenadores = () => {
   });
   const [entrenadores, setEntrenadores] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); // ¡Esto debe estar en el componente!
 
   // Query string con los filtros aplicados
 const buildQuery = () => {
@@ -57,6 +59,7 @@ const buildQuery = () => {
 
   // Buscar entrenadores cada vez que cambian los filtros
     useEffect(() => {
+
       const fetchEntrenadores = async () => {
         setLoading(true);
         const res = await fetch("http://localhost:3001/api/service/trainers" + buildQuery(), {
@@ -164,17 +167,63 @@ const buildQuery = () => {
           {!loading && entrenadores.length === 0 && (
             <div className="busqueda-vacio">No hay entrenadores para los filtros seleccionados.</div>
           )}
-          <div className="busqueda-cards">
-            {entrenadores.map((e, idx) => (
-              <div className="trainer-card" key={idx}>
-                <div className="trainer-name">{e.nombre} {e.apellido}</div>
-                <div className="trainer-presentacion">{e.presentacion}</div>
-                <div className="trainer-zona">{e.zona}</div>
-                <div className="trainer-idiomas">{e.idiomas.join(" / ")}</div>
-                {/* Podés agregar rating y un botón "Ver más" */}
-              </div>
-            ))}
-          </div>
+<div className="busqueda-cards">
+  {entrenadores.map((e, idx) => (
+    <div className="trainer-card" key={e._id || idx}>
+      {/* Imagen circular */}
+      <img
+        src={e.foto || "/foto-por-defecto.png"}
+        alt={e.nombre}
+        className="trainer-avatar"
+        style={{
+          width: 90,
+          height: 90,
+          borderRadius: "50%",
+          objectFit: "cover",
+          margin: "0 auto 12px auto",
+          display: "block"
+        }}
+      />
+      <div className="trainer-name" style={{ fontWeight: 700, fontSize: "1.2rem", marginBottom: 2 }}>
+        {e.nombre} {e.apellido}
+      </div>
+      {/* Rating si lo tenés */}
+      {e.avgRating && (
+        <div style={{ color: "#f6c948", fontSize: 16, fontWeight: 600, margin: "3px 0" }}>
+          ★ {Number(e.avgRating).toFixed(1)}
+        </div>
+      )}
+      {/* Zona */}
+      <div className="trainer-zona" style={{ color: "#888", fontSize: 14, marginBottom: 2 }}>
+        {e.zona}
+      </div>
+      {/* Idiomas */}
+      <div className="trainer-idiomas" style={{ color: "#666", fontSize: 13, marginBottom: 5 }}>
+        {e.idiomas?.join(" / ")}
+      </div>
+      {/* Botón Ver perfil */}
+          <button
+            className="ver-perfil-btn"
+            onClick={() => navigate(`/trainers/${e._id}`)}
+            style={{
+              width: "100%",
+              background: "#222",
+              color: "#fff",
+              fontWeight: 700,
+              fontSize: "1.08rem",
+              borderRadius: 7,
+              border: "none",
+              padding: "9px 0",
+              marginTop: 9,
+              cursor: "pointer",
+              transition: "background 0.14s"
+            }}
+          >
+            Ver perfil
+          </button>
+        </div>
+      ))}
+    </div>
         </main>
       </div>
     </Layout>

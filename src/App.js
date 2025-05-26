@@ -8,7 +8,7 @@ import LoginSuccess from "./components/login-success";
 import LandingPage from './components/LandingPage';
 import SobreNosotros from "./components/SobreNosotros";
 import BusquedaEntrenadores from "./components/BusquedaEntrenadores";
-
+import PerfilEntrenador from "./components/PerfilEntrenador";
 const App = () => {
   return (
     <Router>
@@ -23,6 +23,8 @@ const App = () => {
           <Route path="/sobre-nosotros" element={<SobreNosotros />} />
           <Route path="/sobre-nosotros" element={<SobreNosotros />} />
           <Route path="/service/trainers" element={<BusquedaEntrenadores />} />
+          <Route path="/trainers/:id" element={<PerfilEntrenador />} />
+
         </Routes>
       </div>
     </Router>
