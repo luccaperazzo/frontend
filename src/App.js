@@ -9,6 +9,10 @@ import LandingPage from './components/LandingPage';
 import SobreNosotros from "./components/SobreNosotros";
 import BusquedaEntrenadores from "./components/BusquedaEntrenadores";
 import PerfilEntrenador from "./components/PerfilEntrenador";
+import DetalleServicio from "./components/DetalleServicio";
+import SuccessPage from './components/SuccessPaymentPage';
+
+
 const App = () => {
   return (
     <Router>
@@ -24,6 +28,8 @@ const App = () => {
           <Route path="/sobre-nosotros" element={<SobreNosotros />} />
           <Route path="/service/trainers" element={<BusquedaEntrenadores />} />
           <Route path="/trainers/:id" element={<PerfilEntrenador />} />
+          <Route path="/service/:id" element={<DetalleServicio />} />
+          <Route path="/success" element={<SuccessPage />} />
 
         </Routes>
       </div>
