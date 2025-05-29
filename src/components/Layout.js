@@ -36,7 +36,7 @@ const Header = () => {
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
-      padding: "0px 28px 0 28px"
+      padding: "0px 28px"
     }}>
       <div style={{ display: "flex", alignItems: "center" }}>
         <button
@@ -70,8 +70,7 @@ const Header = () => {
             color: "#222",
             fontSize: 16,
             fontWeight: 500,
-            cursor: "pointer",
-            textDecoration: "none"
+            cursor: "pointer"
           }}
           onClick={() => navigate('/service/trainers')}
         >
@@ -84,15 +83,31 @@ const Header = () => {
             color: "#222",
             fontSize: 16,
             fontWeight: 500,
-            cursor: "pointer",
-            textDecoration: "none"
+            cursor: "pointer"
           }}
           onClick={() => navigate('/sobre-nosotros')}
         >
           Sobre Nosotros
         </button>
 
-        {/* 👇 Solo si NO está logueado 👇 */}
+        {/* 👇 Solo si está logueado como cliente 👇 */}
+        {token && role === "cliente" && (
+          <button
+            style={{
+              background: "none",
+              border: "none",
+              color: "#222",
+              fontSize: 16,
+              fontWeight: 500,
+              cursor: "pointer"
+            }}
+            onClick={() => navigate('/mi-espacio')}
+          >
+            Mi Espacio
+          </button>
+        )}
+
+        {/* 👇 Si NO está logueado 👇 */}
         {!token && (
           <>
             <button
@@ -105,11 +120,10 @@ const Header = () => {
                 borderRadius: 6,
                 padding: "8px 18px",
                 fontSize: 15,
-                marginLeft: 18,
                 cursor: "pointer",
-                marginRight: 2,
                 transition: "all .15s"
-              }}>
+              }}
+            >
               Log In
             </button>
             <button
@@ -124,13 +138,14 @@ const Header = () => {
                 fontSize: 15,
                 cursor: "pointer",
                 transition: "all .15s"
-              }}>
+              }}
+            >
               Registrarse
             </button>
           </>
         )}
 
-        {/* 👇 Si está logueado, mostrar logout 👇 */}
+        {/* 👇 Si está logueado 👇 */}
         {token && (
           <button
             onClick={handleLogout}
@@ -144,19 +159,20 @@ const Header = () => {
               fontSize: 15,
               cursor: "pointer",
               transition: "all .15s"
-            }}>
+            }}
+          >
             Cerrar sesión
           </button>
         )}
       </nav>
     </header>
   );
-};
+}; // <-- Aquí estaba faltando este cierre
 
 const Footer = () => (
   <footer style={{
     borderTop: "1px solid #f2f2f2",
-    padding: "18px 0 16px 0",
+    padding: "18px 0 16px",
     width: "100%",
     maxWidth: 1100,
     margin: "0 auto",

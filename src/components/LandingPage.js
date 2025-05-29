@@ -24,8 +24,37 @@ const LandingPage = () => {
           Encuentra Tu Entrenador Perfecto
         </p>
         <div className="landing-buttons">
-          <button className="landing-btn">Encuentra tu entrenador</button>
-          <button className="landing-btn secondary">Conviértete en entrenador</button>
+              <button
+                style={{
+                background: "#FF6B00", // o el color exacto del botón derecho
+                border: "none",
+                padding: "10px 20px",
+                color: "white",
+                fontSize: 16,
+                fontWeight: "bold", // más grueso que el 500 actual
+                cursor: "pointer",
+                borderRadius: "5px", // agregar bordes redondeados
+                }}
+                onClick={() => navigate('/service/trainers')}
+              >
+                Ver Entrenadores
+              </button>  
+              <button
+                style={{
+                background: "#FF6B00", // o el color exacto del botón derecho
+                border: "none",
+                padding: "10px 20px",
+                color: "white",
+                fontSize: 16,
+                fontWeight: "bold", // más grueso que el 500 actual
+                cursor: "pointer",
+                borderRadius: "5px", // agregar bordes redondeados
+                }}
+                  onClick={() => navigate('/register')}
+              >
+                Conviérte en Entrenador
+              </button>  
+              
         </div>
         <div className="landing-image-container">
           <img

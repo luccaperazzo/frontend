@@ -85,6 +85,16 @@ const DetalleServicio = () => {
         })
       });
       const data = await res.json();
+
+
+      if (!res.ok) {
+        // si status es 400 muestra mensaje y no redirige
+        alert(data.message || "No se pudo crear la reserva, ya existe una reserva para esa fecha y hora.");
+        setBookingLoading(false); // <--- ¡Asegurate de ponerlo aquí!
+        return;
+      }
+
+
       if (data.url) {
         window.location.href = data.url; // Redirigí a Stripe
       } else {

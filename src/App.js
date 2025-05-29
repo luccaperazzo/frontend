@@ -11,6 +11,7 @@ import BusquedaEntrenadores from "./components/BusquedaEntrenadores";
 import PerfilEntrenador from "./components/PerfilEntrenador";
 import DetalleServicio from "./components/DetalleServicio";
 import SuccessPage from './components/SuccessPaymentPage';
+import MiEspacio from './components/MiEspacio';
 
 
 const App = () => {
@@ -30,6 +31,7 @@ const App = () => {
           <Route path="/trainers/:id" element={<PerfilEntrenador />} />
           <Route path="/service/:id" element={<DetalleServicio />} />
           <Route path="/success" element={<SuccessPage />} />
+          <Route path="/mi-espacio" element={<MiEspacio />} />
 
         </Routes>
       </div>

@@ -187,12 +187,21 @@ const buildQuery = () => {
       <div className="trainer-name" style={{ fontWeight: 700, fontSize: "1.2rem", marginBottom: 2 }}>
         {e.nombre} {e.apellido}
       </div>
-      {/* Rating si lo tenés */}
-      {e.avgRating && (
-        <div style={{ color: "#f6c948", fontSize: 16, fontWeight: 600, margin: "3px 0" }}>
-          ★ {Number(e.avgRating).toFixed(1)}
-        </div>
-      )}
+      {typeof e.avgRating === "number" && (
+              <div
+                style={{
+                  color: "#f6c948",
+                  fontSize: 16,
+                  fontWeight: 600,
+                  margin: "3px 0"
+                }}
+              >
+                ★ {e.avgRating.toFixed(1)}{" "}
+                <span style={{ fontWeight: 400, color: "#555" }}>
+                  ({e.totalRatings})
+                </span>
+              </div>
+            )}
       {/* Zona */}
       <div className="trainer-zona" style={{ color: "#888", fontSize: 14, marginBottom: 2 }}>
         {e.zona}

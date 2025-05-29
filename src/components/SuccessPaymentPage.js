@@ -33,7 +33,7 @@ export default function SuccessPage() {
             Volver al Inicio
           </Link>
           <Link
-            to="/mis-reservas"
+            to="/mi-espacio"
             style={{
               padding: '10px 20px',
               background: '#007bff',
