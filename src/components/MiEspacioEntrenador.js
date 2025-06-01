@@ -6,6 +6,8 @@ import Layout from "../Layout" // Ajusta la ruta según tu estructura
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import "./MiEspacioEntrenador.css"
+import ServiceCard from "./ServiceCard"
+import CrearServicioModal from "./CrearServicioModal"
 
 dayjs.extend(utc)
 
@@ -27,6 +29,11 @@ export default function MiEspacioEntrenador() {
   const [actionType, setActionType] = useState("")
   const [selectedReserva, setSelectedReserva] = useState(null)
 
+  // — Estado para servicios —
+  const [servicios, setServicios] = useState([])
+  const [loadingServicios, setLoadingServicios] = useState(false)
+  const [showCreateService, setShowCreateService] = useState(false)
+
   // — Cargar reservas al montar —
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -43,6 +50,79 @@ export default function MiEspacioEntrenador() {
         setLoadingReservas(false)
       })
   }, [])
+
+  // — Cargar servicios del entrenador —
+  const cargarServicios = async () => {
+    setLoadingServicios(true)
+    try {
+      const token = localStorage.getItem("token")
+      const response = await fetch("http://localhost:3001/api/service/my", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await response.json()
+      setServicios(data)
+    } catch (error) {
+      console.error("Error al cargar servicios:", error)
+    } finally {
+      setLoadingServicios(false)
+    }
+  }
+
+  // — Manejar creación de servicio —
+  const handleServiceCreated = (newService) => {
+    setServicios((prev) => [newService, ...prev])
+  }
+
+  // — Manejar edición de servicio —
+  const handleEditService = (servicio) => {
+    console.log("Editar servicio:", servicio)
+    // TODO: Implementar modal de edición
+  }
+
+  // — Manejar eliminación de servicio —
+  const handleDeleteService = async (servicioId) => {
+    try {
+      const token = localStorage.getItem("token")
+      const response = await fetch(`http://localhost:3001/api/service/${servicioId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      if (response.ok) {
+        setServicios((prev) => prev.filter((s) => s._id !== servicioId))
+      } else {
+        console.error("Error al eliminar servicio")
+      }
+    } catch (error) {
+      console.error("Error al eliminar servicio:", error)
+    }
+  }
+
+  // — Manejar publicar/despublicar servicio —
+  const handleTogglePublishService = async (servicioId, currentPublished) => {
+    try {
+      const token = localStorage.getItem("token")
+      const response = await fetch(`http://localhost:3001/api/service/${servicioId}/publish`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      if (response.ok) {
+        setServicios((prev) => prev.map((s) => (s._id === servicioId ? { ...s, publicado: !currentPublished } : s)))
+      } else {
+        console.error("Error al cambiar estado de publicación")
+      }
+    } catch (error) {
+      console.error("Error al cambiar estado de publicación:", error)
+    }
+  }
+
+  // — Cargar servicios cuando se selecciona la tab —
+  useEffect(() => {
+    if (activeTab === "servicios") {
+      cargarServicios()
+    }
+  }, [activeTab])
 
   // — Función para manejar acciones de reserva —
   const handleReservaAction = (reserva, action) => {
@@ -253,11 +333,40 @@ export default function MiEspacioEntrenador() {
 
           {activeTab === "servicios" && (
             <div className="servicios-content">
-              <h2 className="section-title">Servicios</h2>
-              <p className="section-subtitle">Administra tus servicios y tarifas</p>
-              <div className="coming-soon">
-                <p>Próximamente: Gestión de servicios</p>
+              <div className="servicios-header">
+                <div>
+                  <h2 className="section-title">Servicios</h2>
+                  <p className="section-subtitle">Administra tus servicios y tarifas</p>
+                </div>
+                <button className="crear-servicio-btn" onClick={() => setShowCreateService(true)}>
+                  ➕ Crear Servicio
+                </button>
               </div>
+
+              {loadingServicios ? (
+                <div className="loading-state">Cargando servicios...</div>
+              ) : (
+                <div className="servicios-list">
+                  {servicios.length === 0 ? (
+                    <div className="empty-state">
+                      <p>No tienes servicios creados</p>
+                      <button className="crear-primer-servicio-btn" onClick={() => setShowCreateService(true)}>
+                        Crear tu primer servicio
+                      </button>
+                    </div>
+                  ) : (
+                    servicios.map((servicio) => (
+                      <ServiceCard
+                        key={servicio._id}
+                        servicio={servicio}
+                        onEdit={handleEditService}
+                        onDelete={handleDeleteService}
+                        onTogglePublish={handleTogglePublishService}
+                      />
+                    ))
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -281,6 +390,13 @@ export default function MiEspacioEntrenador() {
             </div>
           </div>
         )}
+
+        {/* Modal de crear servicio */}
+        <CrearServicioModal
+          isOpen={showCreateService}
+          onClose={() => setShowCreateService(false)}
+          onServiceCreated={handleServiceCreated}
+        />
       </div>
     </Layout>
   )

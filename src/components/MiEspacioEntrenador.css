@@ -390,3 +390,71 @@
     padding: 24px 20px;
   }
 }
+
+/* Servicios Section */
+.servicios-content {
+  min-height: 400px;
+}
+
+.servicios-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.crear-servicio-btn {
+  background: #000000;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.crear-servicio-btn:hover {
+  background: #333333;
+  transform: translateY(-1px);
+}
+
+.servicios-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.crear-primer-servicio-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 20px;
+}
+
+.crear-primer-servicio-btn:hover {
+  background: #0056b3;
+}
+
+/* Responsive para servicios */
+@media (max-width: 768px) {
+  .servicios-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .crear-servicio-btn {
+    justify-content: center;
+  }
+}
