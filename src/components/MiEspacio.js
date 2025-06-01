@@ -187,10 +187,95 @@ export default function MiEspacio() {
           </>
         )}
 
-        {activeTab === 'documentos' && (
-          <p>Aún no tenés documentos compartidos.</p>
-        )}
-
+{activeTab === 'documentos' && (
+  <div>
+    <h3 style={{ margin: "12px 0 18px 0" }}>Documentos compartidos por tus entrenadores</h3>
+    {loadingReservas ? (
+      <p>Cargando documentos...</p>
+    ) : (
+      <>
+        {(() => {
+          // Agrupar documentos por entrenador
+          const docsPorEntrenador = {};
+          reservas.forEach(r => {
+            const entrenador = r.servicio?.entrenador;
+            if (!entrenador) return;
+            const key = entrenador._id || entrenador; // Puede ser string o {_id,...}
+            if (!docsPorEntrenador[key]) {
+              docsPorEntrenador[key] = {
+                entrenador,
+                documentos: []
+              };
+            }
+            (r.documentos || []).forEach(doc => {
+              docsPorEntrenador[key].documentos.push({
+                ...doc,
+                reservaId: r._id,
+                servicio: r.servicio
+              });
+            });
+          });
+          const grupos = Object.values(docsPorEntrenador);
+          if (grupos.length === 0) {
+            return <p>Aún no tenés documentos compartidos.</p>;
+          }
+          return grupos.map(grupo => (
+            <div key={grupo.entrenador._id || grupo.entrenador} style={{ marginBottom: 28 }}>
+              <div style={{ fontWeight: 700, fontSize: 17, marginBottom: 8 }}>
+                {grupo.entrenador.nombre} {grupo.entrenador.apellido}
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                {grupo.documentos.map((doc, i) => (
+                  <div key={doc.filename + i} style={{
+                    background: "#fafafa",
+                    border: "1px solid #eee",
+                    borderRadius: 8,
+                    padding: 14,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 18
+                  }}>
+                    <span role="img" aria-label="archivo" style={{ fontSize: 24 }}>📄</span>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 600, fontSize: 16 }}>
+                        {doc.originalname}
+                      </div>
+                      <div style={{ color: "#666", fontSize: 14 }}>
+                        {doc.descripcion}
+                      </div>
+                      <div style={{ color: "#aaa", fontSize: 13, marginTop: 2 }}>
+                        {doc.fecha ? new Date(doc.fecha).toLocaleString() : ""}
+                      </div>
+                      <div style={{ color: "#888", fontSize: 13, marginTop: 2 }}>
+                        Servicio: {doc.servicio?.titulo}
+                      </div>
+                    </div>
+                    <a
+                      href={`http://localhost:3001/uploads/documentos/${doc.filename}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        background: "#222",
+                        color: "#fff",
+                        padding: "8px 16px",
+                        borderRadius: 6,
+                        textDecoration: "none",
+                        fontWeight: 600,
+                        fontSize: 15
+                      }}
+                    >
+                      Descargar
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ));
+        })()}
+      </>
+    )}
+  </div>
+)}
         {activeTab === 'misEntrenadores' && (
           <>
             {loadingEntrenadores ? (
