@@ -8,6 +8,8 @@ import utc from "dayjs/plugin/utc"
 import "./MiEspacioEntrenador.css"
 import ServiceCard from "./ServiceCard"
 import CrearServicioModal from "./CrearServicioModal"
+import SessionCard from "./SessionCard"
+import ReprogramarModal from "./ReprogramarModal"
 
 dayjs.extend(utc)
 
@@ -33,6 +35,10 @@ export default function MiEspacioEntrenador() {
   const [servicios, setServicios] = useState([])
   const [loadingServicios, setLoadingServicios] = useState(false)
   const [showCreateService, setShowCreateService] = useState(false)
+
+  // — Estado para reprogramación —
+  const [showReprogramar, setShowReprogramar] = useState(false)
+  const [reservaToReschedule, setReservaToReschedule] = useState(null)
 
   // — Cargar reservas al montar —
   useEffect(() => {
@@ -125,50 +131,86 @@ export default function MiEspacioEntrenador() {
   }, [activeTab])
 
   // — Función para manejar acciones de reserva —
-  const handleReservaAction = (reserva, action) => {
-    setSelectedReserva(reserva)
-    setActionType(action)
-    setShowActionConfirm(true)
+  const handleReservaAction = async (reserva, action) => {
+    try {
+      const token = localStorage.getItem("token")
+      const reservaId = reserva._id || reserva.id
+
+      const response = await fetch(`http://localhost:3001/api/reserve/${reservaId}/state`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Error al actualizar la reserva")
+      }
+
+      const updatedReserva = await response.json()
+
+      // Actualizar la lista de reservas
+      setReservas((prev) =>
+        prev.map((r) => (r._id === reservaId || r.id === reservaId ? { ...r, estado: updatedReserva.estado } : r)),
+      )
+
+      console.log(`Acción ${action} ejecutada correctamente`)
+    } catch (error) {
+      console.error("Error al ejecutar acción:", error)
+      alert(`Error: ${error.message}`)
+    }
   }
 
-  // — Confirmar acción —
-  const confirmarAccion = () => {
-    const token = localStorage.getItem("token")
-    let newState = ""
+  // — Función para abrir modal de reprogramación —
+  const handleReprogramar = (reserva) => {
+    setReservaToReschedule(reserva)
+    setShowReprogramar(true)
+  }
 
-    switch (actionType) {
-      case "aceptar":
-        newState = "confirmed"
-        break
-      case "cancelar":
-        newState = "cancelled"
-        break
-      case "reagendar":
-        newState = "rescheduled"
-        break
-      default:
-        newState = actionType
+  // — Función para confirmar reprogramación —
+  const handleConfirmReprogramar = async (nuevaFechaInicio) => {
+    try {
+      const token = localStorage.getItem("token")
+      const reservaId = reservaToReschedule._id || reservaToReschedule.id
+
+      const response = await fetch(`http://localhost:3001/api/reserve/${reservaId}/state`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "Reprogramar",
+          fechaInicio: nuevaFechaInicio,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Error al reprogramar la reserva")
+      }
+
+      const updatedReserva = await response.json()
+
+      // Actualizar la lista de reservas
+      setReservas((prev) =>
+        prev.map((r) =>
+          r._id === reservaId || r.id === reservaId
+            ? { ...r, estado: updatedReserva.estado, fechaInicio: updatedReserva.fechaInicio }
+            : r,
+        ),
+      )
+
+      setShowReprogramar(false)
+      setReservaToReschedule(null)
+      console.log("Sesión reprogramada correctamente")
+    } catch (error) {
+      console.error("Error al reprogramar:", error)
+      alert(`Error: ${error.message}`)
     }
-
-    fetch(`http://localhost:3001/api/reserve/${selectedReserva.id}/state`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ state: newState }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setReservas((prev) => prev.map((r) => (r.id === selectedReserva.id ? { ...r, state: newState } : r)))
-        setShowActionConfirm(false)
-        setSelectedReserva(null)
-        setActionType("")
-      })
-      .catch((error) => {
-        console.error("Error al actualizar reserva:", error)
-        setShowActionConfirm(false)
-      })
   }
 
   // — Función para obtener el color del estado —
@@ -259,61 +301,12 @@ export default function MiEspacioEntrenador() {
                     </div>
                   ) : (
                     reservas.map((reserva) => (
-                      <div key={reserva.id} className="reserva-item">
-                        <div className="client-avatar">{getIniciales(reserva.clientName || "Cliente")}</div>
-
-                        <div className="reserva-details">
-                          <h4 className="client-name">{reserva.clientName || "Cliente"}</h4>
-                          <p className="service-name">{reserva.serviceName || "Entrenamiento personalizado"}</p>
-                        </div>
-
-                        <div className="reserva-datetime">
-                          <div className="date-info">📅 {formatearFecha(reserva.date)}</div>
-                          <div className="time-info">🕐 {formatearHora(reserva.date)}</div>
-                        </div>
-
-                        <div className="reserva-status">
-                          <span className="status-badge" style={{ backgroundColor: getEstadoColor(reserva.state) }}>
-                            Estado: {reserva.state || "Pendiente"}
-                          </span>
-                        </div>
-
-                        <div className="reserva-actions">
-                          {reserva.state?.toLowerCase() === "pending" && (
-                            <>
-                              <button
-                                className="action-btn accept-btn"
-                                onClick={() => handleReservaAction(reserva, "aceptar")}
-                              >
-                                ✓ Aceptar
-                              </button>
-                              <button
-                                className="action-btn cancel-btn"
-                                onClick={() => handleReservaAction(reserva, "cancelar")}
-                              >
-                                ✗ Cancelar
-                              </button>
-                            </>
-                          )}
-
-                          {reserva.state?.toLowerCase() === "confirmed" && (
-                            <>
-                              <button
-                                className="action-btn reschedule-btn"
-                                onClick={() => handleReservaAction(reserva, "reagendar")}
-                              >
-                                📅 Reagendar
-                              </button>
-                              <button
-                                className="action-btn cancel-btn"
-                                onClick={() => handleReservaAction(reserva, "cancelar")}
-                              >
-                                ✗ Cancelar
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </div>
+                      <SessionCard
+                        key={reserva._id || reserva.id}
+                        reserva={reserva}
+                        onAction={handleReservaAction}
+                        onReprogramar={handleReprogramar}
+                      />
                     ))
                   )}
                 </div>
@@ -371,31 +364,22 @@ export default function MiEspacioEntrenador() {
           )}
         </div>
 
-        {/* Modal de confirmación */}
-        {showActionConfirm && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <h3>Confirmar acción</h3>
-              <p>
-                ¿Estás seguro que quieres {actionType} la sesión con {selectedReserva?.clientName}?
-              </p>
-              <div className="modal-actions">
-                <button className="confirm-btn" onClick={confirmarAccion}>
-                  Confirmar
-                </button>
-                <button className="cancel-modal-btn" onClick={() => setShowActionConfirm(false)}>
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Modal de crear servicio */}
         <CrearServicioModal
           isOpen={showCreateService}
           onClose={() => setShowCreateService(false)}
           onServiceCreated={handleServiceCreated}
+        />
+
+        {/* Modal de reprogramación */}
+        <ReprogramarModal
+          isOpen={showReprogramar}
+          onClose={() => {
+            setShowReprogramar(false)
+            setReservaToReschedule(null)
+          }}
+          reserva={reservaToReschedule}
+          onConfirm={handleConfirmReprogramar}
         />
       </div>
     </Layout>

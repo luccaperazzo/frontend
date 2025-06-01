@@ -1,0 +1,278 @@
+/* SessionCard.css */
+
+.session-card {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.session-card:hover {
+  border-color: #dee2e6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.session-card-content {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto;
+  align-items: center;
+  padding: 20px 24px;
+  gap: 24px;
+}
+
+/* Avatar del cliente */
+.client-avatar-session {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #6c757d;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* Información del cliente */
+.session-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.client-name-session {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.service-name-session {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Fecha y hora */
+.session-datetime {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 120px;
+}
+
+.datetime-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.datetime-icon {
+  font-size: 0.9rem;
+}
+
+.datetime-text {
+  font-size: 0.9rem;
+  color: #495057;
+  font-weight: 500;
+}
+
+/* Estado */
+.session-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 100px;
+}
+
+.status-label {
+  font-size: 0.85rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.status-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* Botones de acción */
+.session-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.action-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Botón Aceptar */
+.accept-btn-session {
+  background: #343a40;
+  color: white;
+  border: 1px solid #343a40;
+}
+
+.accept-btn-session:hover:not(:disabled) {
+  background: #23272b;
+  border-color: #23272b;
+}
+
+/* Botón Rechazar */
+.reject-btn-session {
+  background: #dc3545;
+  color: white;
+  border: 1px solid #dc3545;
+}
+
+.reject-btn-session:hover:not(:disabled) {
+  background: #c82333;
+  border-color: #c82333;
+}
+
+/* Botón Reprogramar */
+.reschedule-btn-session {
+  background: #343a40;
+  color: white;
+  border: 1px solid #343a40;
+}
+
+.reschedule-btn-session:hover:not(:disabled) {
+  background: #23272b;
+  border-color: #23272b;
+}
+
+/* Botón Cancelar */
+.cancel-btn-session {
+  background: #dc3545;
+  color: white;
+  border: 1px solid #dc3545;
+}
+
+.cancel-btn-session:hover:not(:disabled) {
+  background: #c82333;
+  border-color: #c82333;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .session-card-content {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 16px;
+  }
+
+  .session-info {
+    grid-column: 1 / -1;
+  }
+
+  .session-datetime {
+    grid-column: 1 / 2;
+    flex-direction: row;
+    gap: 16px;
+  }
+
+  .session-status {
+    grid-column: 2 / 3;
+    align-items: flex-end;
+  }
+
+  .session-actions {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .session-card-content {
+    grid-template-columns: auto 1fr;
+    padding: 16px 20px;
+    gap: 12px;
+  }
+
+  .client-avatar-session {
+    width: 40px;
+    height: 40px;
+    font-size: 0.9rem;
+  }
+
+  .client-name-session {
+    font-size: 1rem;
+  }
+
+  .service-name-session {
+    font-size: 0.85rem;
+  }
+
+  .session-datetime {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .datetime-text {
+    font-size: 0.85rem;
+  }
+
+  .session-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .action-btn {
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .session-card-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 16px;
+  }
+
+  .session-info,
+  .session-datetime,
+  .session-status,
+  .session-actions {
+    grid-column: 1;
+  }
+
+  .session-datetime {
+    justify-content: center;
+  }
+
+  .session-status {
+    align-items: center;
+  }
+
+  .action-btn {
+    min-width: 120px;
+  }
+}
