@@ -1,49 +1,50 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Login-CSS.css';
-import Layout from "./Layout";
+"use client"
+
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import "./Login-CSS.css"
+import Layout from "./Layout"
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const navigate = useNavigate()
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError(""); // (si tenés manejo de error)
-  try {
-    const response = await fetch("http://localhost:3001/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await response.json();
-    console.log("RESPUESTA LOGIN:", data); // 👈 Debug
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError("") // (si tenés manejo de error)
+    try {
+      const response = await fetch("http://localhost:3001/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+      const data = await response.json()
+      console.log("RESPUESTA LOGIN:", data) // 👈 Debug
 
-    if (!response.ok) {
-      setError(data.error || "Login fallido");
-      return;
+      if (!response.ok) {
+        setError(data.error || "Login fallido")
+        return
+      }
+
+      // 👇 GUARDADO EN localStorage 👇
+      localStorage.setItem("token", data.token)
+      localStorage.setItem("role", data.role)
+
+      // 👇 REDIRECCIÓN AUTOMÁTICA SEGÚN EL ROLE 👇
+      if (data.role === "entrenador") {
+        navigate("/entrenador/mi-espacio")
+      } else if (data.role === "cliente") {
+        navigate("/mi-espacio")
+      } else {
+        // Fallback por si hay otros roles o no se reconoce
+        navigate("/login-success")
+      }
+    } catch (err) {
+      setError("Error de red o del servidor")
     }
-
-    // 👇 ACÁ VA EL GUARDADO EN localStorage 👇
-    localStorage.setItem("token", data.token);
-
-    // Si el rol viene como data.role:
-    if (data.role) {
-      localStorage.setItem("role", data.role);
-    }
-    // O si viene como data.user.role:
-    if (data.user && data.user.role) {
-      localStorage.setItem("role", data.user.role);
-    }
-
-    // Redirigí al login-success, o a donde quieras:
-    navigate("/login-success");
-  } catch (err) {
-    setError("Error de red o del servidor");
   }
-};
 
   return (
     <Layout>
@@ -58,7 +59,7 @@ const handleSubmit = async (e) => {
               type="email"
               autoComplete="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
@@ -70,11 +71,13 @@ const handleSubmit = async (e) => {
               type="password"
               autoComplete="current-password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
-          <button className="login-btn" type="submit">Iniciar sesión</button>
+          <button className="login-btn" type="submit">
+            Iniciar sesión
+          </button>
           {error && <p className="login-error">{error}</p>}
           <div className="login-footer">
             <span>¿Olvidaste tu contraseña?</span>
@@ -83,7 +86,7 @@ const handleSubmit = async (e) => {
         </form>
       </div>
     </Layout>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login
