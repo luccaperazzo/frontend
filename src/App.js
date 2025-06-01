@@ -12,6 +12,7 @@ import PerfilEntrenador from "./components/PerfilEntrenador";
 import DetalleServicio from "./components/DetalleServicio";
 import SuccessPage from './components/SuccessPaymentPage';
 import MiEspacio from './components/MiEspacio';
+import MiEspacioEntrenador from './components/MiEspacioEntrenador';
 
 
 const App = () => {
@@ -32,7 +33,7 @@ const App = () => {
           <Route path="/service/:id" element={<DetalleServicio />} />
           <Route path="/success" element={<SuccessPage />} />
           <Route path="/mi-espacio" element={<MiEspacio />} />
-
+          <Route path="/entrenador/mi-espacio" element={<MiEspacioEntrenador />} />
         </Routes>
       </div>
     </Router>
