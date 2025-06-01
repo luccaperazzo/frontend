@@ -7,7 +7,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import "./MiEspacioEntrenador.css"
 import ServiceCard from "./ServiceCard"
-import CrearServicioModal from "./CrearServicioModal"
+import EditarServicioModal from "./EditarServicioModal"
 import SessionCard from "./SessionCard"
 import ReprogramarModal from "./ReprogramarModal"
 
@@ -34,7 +34,9 @@ export default function MiEspacioEntrenador() {
   // — Estado para servicios —
   const [servicios, setServicios] = useState([])
   const [loadingServicios, setLoadingServicios] = useState(false)
-  const [showCreateService, setShowCreateService] = useState(false)
+  const [showServiceModal, setShowServiceModal] = useState(false)
+  const [isEditingService, setIsEditingService] = useState(false)
+  const [selectedService, setSelectedService] = useState(null)
 
   // — Estado para reprogramación —
   const [showReprogramar, setShowReprogramar] = useState(false)
@@ -74,15 +76,36 @@ export default function MiEspacioEntrenador() {
     }
   }
 
-  // — Manejar creación de servicio —
-  const handleServiceCreated = (newService) => {
-    setServicios((prev) => [newService, ...prev])
+  // — Manejar creación/edición de servicio —
+  const handleServiceUpdated = (updatedService, isEditing) => {
+    if (isEditing) {
+      // Actualizar servicio existente
+      setServicios((prev) => prev.map((s) => (s._id === updatedService._id ? updatedService : s)))
+    } else {
+      // Agregar nuevo servicio
+      setServicios((prev) => [updatedService, ...prev])
+    }
   }
 
   // — Manejar edición de servicio —
   const handleEditService = (servicio) => {
-    console.log("Editar servicio:", servicio)
-    // TODO: Implementar modal de edición
+    setSelectedService(servicio)
+    setIsEditingService(true)
+    setShowServiceModal(true)
+  }
+
+  // — Manejar creación de nuevo servicio —
+  const handleCreateService = () => {
+    setSelectedService(null)
+    setIsEditingService(false)
+    setShowServiceModal(true)
+  }
+
+  // — Cerrar modal de servicio —
+  const handleCloseServiceModal = () => {
+    setShowServiceModal(false)
+    setIsEditingService(false)
+    setSelectedService(null)
   }
 
   // — Manejar eliminación de servicio —
@@ -213,41 +236,6 @@ export default function MiEspacioEntrenador() {
     }
   }
 
-  // — Función para obtener el color del estado —
-  const getEstadoColor = (state) => {
-    switch (state?.toLowerCase()) {
-      case "confirmed":
-        return "#28a745"
-      case "pending":
-        return "#ffc107"
-      case "cancelled":
-        return "#dc3545"
-      case "rescheduled":
-        return "#17a2b8"
-      default:
-        return "#6c757d"
-    }
-  }
-
-  // — Función para obtener las iniciales —
-  const getIniciales = (nombre) => {
-    return nombre
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-  }
-
-  // — Función para formatear fecha —
-  const formatearFecha = (fecha) => {
-    return dayjs(fecha).format("DD/MM/YYYY")
-  }
-
-  // — Función para formatear hora —
-  const formatearHora = (fecha) => {
-    return dayjs(fecha).format("HH:mm")
-  }
-
   return (
     <Layout>
       <div className="mi-espacio-entrenador">
@@ -331,7 +319,7 @@ export default function MiEspacioEntrenador() {
                   <h2 className="section-title">Servicios</h2>
                   <p className="section-subtitle">Administra tus servicios y tarifas</p>
                 </div>
-                <button className="crear-servicio-btn" onClick={() => setShowCreateService(true)}>
+                <button className="crear-servicio-btn" onClick={handleCreateService}>
                   ➕ Crear Servicio
                 </button>
               </div>
@@ -343,7 +331,7 @@ export default function MiEspacioEntrenador() {
                   {servicios.length === 0 ? (
                     <div className="empty-state">
                       <p>No tienes servicios creados</p>
-                      <button className="crear-primer-servicio-btn" onClick={() => setShowCreateService(true)}>
+                      <button className="crear-primer-servicio-btn" onClick={handleCreateService}>
                         Crear tu primer servicio
                       </button>
                     </div>
@@ -364,11 +352,13 @@ export default function MiEspacioEntrenador() {
           )}
         </div>
 
-        {/* Modal de crear servicio */}
-        <CrearServicioModal
-          isOpen={showCreateService}
-          onClose={() => setShowCreateService(false)}
-          onServiceCreated={handleServiceCreated}
+        {/* Modal de crear/editar servicio */}
+        <EditarServicioModal
+          isOpen={showServiceModal}
+          onClose={handleCloseServiceModal}
+          onServiceUpdated={handleServiceUpdated}
+          servicio={selectedService}
+          isEditing={isEditingService}
         />
 
         {/* Modal de reprogramación */}

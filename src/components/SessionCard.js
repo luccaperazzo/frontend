@@ -57,8 +57,12 @@ const SessionCard = ({ reserva, onAction, onReprogramar }) => {
       case "reprogramado":
       case "rescheduled":
         return { color: "#17a2b8", text: "Reprogramado" }
+      case "finalizado":
+      case "finished":
+      case "completed":
+        return { color: "#6610f2", text: "Finalizado" }
       default:
-        return { color: "#ffc107", text: "Pendiente" }
+        return { color: "#6c757d", text: state || "Desconocido" }
     }
   }
 
@@ -73,6 +77,13 @@ const SessionCard = ({ reserva, onAction, onReprogramar }) => {
     reserva.estado?.toLowerCase() === "confirmed" ||
     reserva.state?.toLowerCase() === "aceptado" ||
     reserva.state?.toLowerCase() === "confirmed"
+  const isFinished =
+    reserva.estado?.toLowerCase() === "finalizado" ||
+    reserva.estado?.toLowerCase() === "finished" ||
+    reserva.estado?.toLowerCase() === "completed" ||
+    reserva.state?.toLowerCase() === "finalizado" ||
+    reserva.state?.toLowerCase() === "finished" ||
+    reserva.state?.toLowerCase() === "completed"
 
   return (
     <div className="session-card">
@@ -145,13 +156,6 @@ const SessionCard = ({ reserva, onAction, onReprogramar }) => {
           {isAccepted && (
             <>
               <button
-                className="action-btn reschedule-btn-session"
-                onClick={() => handleAction("Reprogramar")}
-                disabled={loading}
-              >
-                Reprogramar
-              </button>
-              <button
                 className="action-btn cancel-btn-session"
                 onClick={() => handleAction("Cancelar")}
                 disabled={loading}
@@ -160,6 +164,9 @@ const SessionCard = ({ reserva, onAction, onReprogramar }) => {
               </button>
             </>
           )}
+
+          {/* No mostramos botones para sesiones finalizadas */}
+          {isFinished && <span className="session-finished-message">Sesión completada</span>}
         </div>
       </div>
     </div>

@@ -179,6 +179,14 @@
   border-color: #c82333;
 }
 
+/* Mensaje de sesión finalizada */
+.session-finished-message {
+  font-size: 0.9rem;
+  color: #6610f2;
+  font-style: italic;
+  font-weight: 500;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .session-card-content {
