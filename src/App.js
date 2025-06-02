@@ -13,7 +13,7 @@ import DetalleServicio from "./components/DetalleServicio";
 import SuccessPage from './components/SuccessPaymentPage';
 import MiEspacio from './components/MiEspacio';
 import MiEspacioEntrenador from './components/MiEspacioEntrenador';
-
+import MiEspacioMetrics from './components/MiEspacioMetrics';
 
 const App = () => {
   return (
@@ -34,6 +34,7 @@ const App = () => {
           <Route path="/success" element={<SuccessPage />} />
           <Route path="/mi-espacio" element={<MiEspacio />} />
           <Route path="/entrenador/mi-espacio" element={<MiEspacioEntrenador />} />
+          <Route path="/metrics" element={<MiEspacioMetrics />} />
         </Routes>
       </div>
     </Router>

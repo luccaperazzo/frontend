@@ -315,7 +315,7 @@ export default function MiEspacioEntrenador() {
             )}
             <p className="subtitle">Gestiona tus sesiones, servicios y documentos compartidos con cada cliente.</p>
           </div>
-          <button className="metricas-btn" onClick={() => setShowMetricas(true)}>
+          <button className="metricas-btn" onClick={() => navigate("/metrics")}>
             📊 Métricas
           </button>
         </div>

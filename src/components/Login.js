@@ -32,6 +32,12 @@ const Login = () => {
       localStorage.setItem("token", data.token)
       localStorage.setItem("role", data.role)
 
+      
+      if (data.user && data.user._id) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("userId", data.user._id);
+      }
+
       // 👇 REDIRECCIÓN AUTOMÁTICA SEGÚN EL ROLE 👇
       if (data.role === "entrenador") {
         navigate("/entrenador/mi-espacio")
