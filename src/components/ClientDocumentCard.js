@@ -110,47 +110,70 @@ const ClientDocumentCard = ({ cliente, reservas, onDocumentUploaded }) => {
     }
   }
 
-  const handleDownload = async (document) => {
+  const handleDownload = async (doc) => {
     try {
+      console.log("🔍 DEBUG Frontend - Intentando descargar:", {
+        filename: doc.filename,
+        reservaId: doc.reservaId,
+        url: `http://localhost:3001/api/reserve/${doc.reservaId}/documents/${doc.filename}`,
+      })
+
       const token = localStorage.getItem("token")
-      const response = await fetch(
-        `http://localhost:3001/api/reserve/${document.reservaId}/documents/${document.filename}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
+
+      // Crear la URL de descarga directa
+      const downloadUrl = `http://localhost:3001/api/reserve/${doc.reservaId}/documents/${encodeURIComponent(doc.filename)}`
+
+      const response = await fetch(downloadUrl, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      )
+      })
+
+      console.log("🔍 DEBUG Frontend - Response status:", response.status)
 
       if (response.ok) {
+        // Obtener el blob del archivo
         const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
+
+        // Crear URL temporal para el blob
+        const blobUrl = window.URL.createObjectURL(blob)
+
+        // Crear elemento de descarga
         const a = document.createElement("a")
-        a.href = url
-        a.download = document.displayName
+        a.href = blobUrl
+        a.download = doc.displayName
+        a.style.display = "none"
+
+        // Agregar al DOM, hacer click y remover
         document.body.appendChild(a)
         a.click()
-        window.URL.revokeObjectURL(url)
         document.body.removeChild(a)
+
+        // Limpiar la URL temporal
+        window.URL.revokeObjectURL(blobUrl)
+
+        console.log("✅ Descarga exitosa")
       } else {
-        alert("Error al descargar el documento")
+        const errorText = await response.text()
+        console.error("❌ Error en descarga:", response.status, errorText)
+        alert("Error al descargar el documento: " + errorText)
       }
     } catch (error) {
       console.error("Error downloading document:", error)
-      alert("Error al descargar el documento")
+      alert("Error al descargar el documento: " + error.message)
     }
   }
 
-  const handleDelete = async (document) => {
-    if (!window.confirm(`¿Estás seguro de eliminar "${document.displayName}"?`)) return
+  const handleDelete = async (doc) => {
+    if (!window.confirm(`¿Estás seguro de eliminar "${doc.displayName}"?`)) return
 
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch(
-        `http://localhost:3001/api/reserve/${document.reservaId}/documents/${document.filename}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      )
+      const response = await fetch(`http://localhost:3001/api/reserve/${doc.reservaId}/documents/${doc.filename}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      })
 
       if (response.ok) {
         loadAllDocuments() // Recargar documentos
