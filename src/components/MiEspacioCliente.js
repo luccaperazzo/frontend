@@ -5,14 +5,14 @@ import { useNavigate } from "react-router-dom"
 import Layout from "../Layout"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
-import "./MiEspacio.css"
+import "./MiEspacioCliente.css"
 import ClientSessionCard from "./ClientSessionCard"
 import TrainerCard from "./TrainerCard"
 import ReviewModal from "./ReviewModal"
 
 dayjs.extend(utc)
 
-export default function MiEspacio() {
+export default function MiEspacioCliente() {
   const navigate = useNavigate()
 
   // Pestaña activa

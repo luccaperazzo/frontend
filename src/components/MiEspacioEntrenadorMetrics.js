@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Layout from "./Layout";
-import "./MiEspacioMetrics.css";
+import "./MiEspacioEntrenadorMetrics.css";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/es";

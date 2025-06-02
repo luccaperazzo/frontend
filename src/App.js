@@ -11,9 +11,9 @@ import BusquedaEntrenadores from "./components/BusquedaEntrenadores";
 import PerfilEntrenador from "./components/PerfilEntrenador";
 import DetalleServicio from "./components/DetalleServicio";
 import SuccessPage from './components/SuccessPaymentPage';
-import MiEspacio from './components/MiEspacio';
+import MiEspacioCliente from './components/MiEspacioCliente';
 import MiEspacioEntrenador from './components/MiEspacioEntrenador';
-import MiEspacioMetrics from './components/MiEspacioMetrics';
+import MiEspacioEntrenadorMetrics from './components/MiEspacioEntrenadorMetrics';
 
 const App = () => {
   return (
@@ -32,9 +32,9 @@ const App = () => {
           <Route path="/trainers/:id" element={<PerfilEntrenador />} />
           <Route path="/service/:id" element={<DetalleServicio />} />
           <Route path="/success" element={<SuccessPage />} />
-          <Route path="/mi-espacio" element={<MiEspacio />} />
+          <Route path="/mi-espacio" element={<MiEspacioCliente />} />
           <Route path="/entrenador/mi-espacio" element={<MiEspacioEntrenador />} />
-          <Route path="/metrics" element={<MiEspacioMetrics />} />
+          <Route path="/metrics" element={<MiEspacioEntrenadorMetrics />} />
         </Routes>
       </div>
     </Router>
