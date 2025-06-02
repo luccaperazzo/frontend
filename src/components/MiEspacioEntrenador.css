@@ -55,6 +55,29 @@
   border-color: #dee2e6;
 }
 
+/* User Info */
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0 16px 0;
+}
+
+.user-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #007bff;
+  letter-spacing: 0.5px;
+}
+
+.user-role {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
 /* Tabs Navigation */
 .tabs-navigation {
   display: flex;
@@ -369,6 +392,19 @@
 
   .reserva-actions {
     justify-content: center;
+  }
+
+  /* Responsive adjustments */
+  .user-info {
+    margin: 6px 0 12px 0;
+  }
+
+  .user-name {
+    font-size: 1.1rem;
+  }
+
+  .user-role {
+    font-size: 0.85rem;
   }
 }
 

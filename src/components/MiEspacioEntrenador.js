@@ -47,6 +47,10 @@ export default function MiEspacioEntrenador() {
   const [clientesConReservas, setClientesConReservas] = useState([])
   const [loadingDocuments, setLoadingDocuments] = useState(false)
 
+  // Add after the existing state declarations
+  const [userData, setUserData] = useState(null)
+  const [loadingUser, setLoadingUser] = useState(true)
+
   // — Cargar reservas al montar —
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -63,6 +67,23 @@ export default function MiEspacioEntrenador() {
       .catch((error) => {
         console.error("Error al cargar reservas:", error)
         setLoadingReservas(false)
+      })
+  }, [])
+
+  // Add this useEffect after the existing ones
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+    fetch("http://localhost:3001/api/auth/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setUserData(data)
+        setLoadingUser(false)
+      })
+      .catch((error) => {
+        console.error("Error al cargar datos del usuario:", error)
+        setLoadingUser(false)
       })
   }, [])
 
@@ -284,6 +305,14 @@ export default function MiEspacioEntrenador() {
         <div className="header-section">
           <div className="title-section">
             <h1 className="main-title">MI ESPACIO</h1>
+            {!loadingUser && userData && (
+              <div className="user-info">
+                <span className="user-name">
+                  {userData.nombre} {userData.apellido}
+                </span>
+                <span className="user-role">Entrenador</span>
+              </div>
+            )}
             <p className="subtitle">Gestiona tus sesiones, servicios y documentos compartidos con cada cliente.</p>
           </div>
           <button className="metricas-btn" onClick={() => setShowMetricas(true)}>

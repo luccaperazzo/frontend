@@ -1,97 +1,93 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+"use client"
+import { useNavigate } from "react-router-dom"
+// Eliminar esta línea: import "./Layout.css"
+import { useEffect, useState } from "react"
 
-const Header = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+export default function Layout({ children }) {
+  const navigate = useNavigate()
 
-  // Estado local para token y rol
-  const [token, setToken] = useState(localStorage.getItem("token"));
-  const [role, setRole] = useState(localStorage.getItem("role"));
-
-  // Efecto para actualizar el estado cuando cambia la sesión
-  useEffect(() => {
-    const syncAuth = () => {
-      setToken(localStorage.getItem("token"));
-      setRole(localStorage.getItem("role"));
-    };
-    window.addEventListener("storage", syncAuth);
-    syncAuth();
-    return () => window.removeEventListener("storage", syncAuth);
-  }, [location]);
+  const [userData, setUserData] = useState(null)
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    setToken(null);
-    setRole(null);
-    navigate("/login");
-  };
+    localStorage.removeItem("token")
+    localStorage.removeItem("role")
+    navigate("/login")
+  }
+
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+    if (token) {
+      fetch("http://localhost:3001/api/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setUserData(data)
+        })
+        .catch((error) => {
+          console.error("Error al cargar datos del usuario:", error)
+        })
+    }
+  }, [])
 
   return (
-    <header style={{
-      width: "100%",
-      maxWidth: 1400,
-      margin: "0 auto",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "0px 28px"
-    }}>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <button
-          style={{
-            background: "none",
-            border: "none",
-            padding: 0,
-            margin: 0,
-            cursor: "pointer",
-            outline: "none"
-          }}
-          onClick={() => navigate('/')}
-          aria-label="Ir a la página principal"
-        >
-          <span style={{
-            fontWeight: 900,
-            fontSize: "2.5rem",
-            color: "#222",
-            letterSpacing: "2px",
-            marginRight: 28
-          }}>
-            F
-          </span>
-        </button>
-      </div>
-      <nav style={{ display: "flex", alignItems: "center", gap: 28 }}>
-        <button
-          style={{
-            background: "none",
-            border: "none",
-            color: "#222",
-            fontSize: 16,
-            fontWeight: 500,
-            cursor: "pointer"
-          }}
-          onClick={() => navigate('/service/trainers')}
-        >
-          Entrenadores
-        </button>
-        <button
-          style={{
-            background: "none",
-            border: "none",
-            color: "#222",
-            fontSize: 16,
-            fontWeight: 500,
-            cursor: "pointer"
-          }}
-          onClick={() => navigate('/sobre-nosotros')}
-        >
-          Sobre Nosotros
-        </button>
-
-        {/* 👇 Solo si está logueado como cliente 👇 */}
-        {token && role === "cliente" && (
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        background: "#fff",
+      }}
+    >
+      <header
+        style={{
+          width: "100%",
+          maxWidth: 1400,
+          margin: "0 auto",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0px 28px",
+          height: "80px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <button
+            style={{
+              background: "none",
+              border: "none",
+              padding: 0,
+              margin: 0,
+              cursor: "pointer",
+              outline: "none",
+            }}
+            onClick={() => navigate("/")}
+            aria-label="Ir a la página principal"
+          >
+            <span
+              style={{
+                fontWeight: 900,
+                fontSize: "2.5rem",
+                color: "#222",
+                letterSpacing: "2px",
+              }}
+            >
+              F
+            </span>
+          </button>
+          {userData && (
+            <span
+              style={{
+                fontSize: "1.1rem",
+                fontWeight: 600,
+                color: "#007bff",
+              }}
+            >
+              {userData.nombre} {userData.apellido}
+            </span>
+          )}
+        </div>
+        <nav style={{ display: "flex", alignItems: "center", gap: 28 }}>
           <button
             style={{
               background: "none",
@@ -99,16 +95,12 @@ const Header = () => {
               color: "#222",
               fontSize: 16,
               fontWeight: 500,
-              cursor: "pointer"
+              cursor: "pointer",
             }}
-            onClick={() => navigate('/mi-espacio')}
+            onClick={() => navigate("/service/trainers")}
           >
-            Mi Espacio
+            Entrenadores
           </button>
-        )}
-
-        {/* 👇 Solo si está logueado como entrenador 👇 */}
-        {token && role === "entrenador" && (
           <button
             style={{
               background: "none",
@@ -116,54 +108,25 @@ const Header = () => {
               color: "#222",
               fontSize: 16,
               fontWeight: 500,
-              cursor: "pointer"
+              cursor: "pointer",
             }}
-            onClick={() => navigate('/entrenador/mi-espacio')}
+            onClick={() => navigate("/sobre-nosotros")}
+          >
+            Sobre Nosotros
+          </button>
+          <button
+            style={{
+              background: "none",
+              border: "none",
+              color: "#222",
+              fontSize: 16,
+              fontWeight: 500,
+              cursor: "pointer",
+            }}
+            onClick={() => navigate("/mi-espacio")}
           >
             Mi Espacio
           </button>
-        )}
-
-        {/* 👇 Si NO está logueado 👇 */}
-        {!token && (
-          <>
-            <button
-              onClick={() => navigate('/login')}
-              style={{
-                background: "#fff",
-                color: "#111",
-                fontWeight: 600,
-                border: "1px solid #ddd",
-                borderRadius: 6,
-                padding: "8px 18px",
-                fontSize: 15,
-                cursor: "pointer",
-                transition: "all .15s"
-              }}
-            >
-              Log In
-            </button>
-            <button
-              onClick={() => navigate('/register')}
-              style={{
-                background: "#222",
-                color: "#fff",
-                fontWeight: 600,
-                border: "none",
-                borderRadius: 6,
-                padding: "8px 18px",
-                fontSize: 15,
-                cursor: "pointer",
-                transition: "all .15s"
-              }}
-            >
-              Registrarse
-            </button>
-          </>
-        )}
-
-        {/* 👇 Si está logueado 👇 */}
-        {token && (
           <button
             onClick={handleLogout}
             style={{
@@ -175,57 +138,48 @@ const Header = () => {
               padding: "8px 18px",
               fontSize: 15,
               cursor: "pointer",
-              transition: "all .15s"
+              transition: "all .15s",
             }}
           >
             Cerrar sesión
           </button>
-        )}
-      </nav>
-    </header>
-  );
-};
-
-const Footer = () => (
-  <footer style={{
-    borderTop: "1px solid #f2f2f2",
-    padding: "18px 0 16px",
-    width: "100%",
-    maxWidth: 1100,
-    margin: "0 auto",
-    display: "flex",
-    alignItems: "center",
-    gap: 8
-  }}>
-    <div style={{ display: "flex", alignItems: "center" }}>
-      <span style={{
-        fontWeight: 900,
-        fontSize: "2.5rem",
-        color: "#222",
-        letterSpacing: "2px",
-        marginLeft: 7
-      }}>F</span>
+        </nav>
+      </header>
+      <div style={{ flex: 1 }}>{children}</div>
+      <footer
+        style={{
+          borderTop: "1px solid #f2f2f2",
+          padding: "18px 0 16px",
+          width: "100%",
+          maxWidth: 1100,
+          margin: "0 auto",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <span
+            style={{
+              fontWeight: 900,
+              fontSize: "2.5rem",
+              color: "#222",
+              letterSpacing: "2px",
+              marginLeft: 7,
+            }}
+          >
+            F
+          </span>
+        </div>
+        <span
+          style={{
+            color: "#888",
+            fontSize: 14,
+          }}
+        >
+          © FitConnect {new Date().getFullYear()}
+        </span>
+      </footer>
     </div>
-    <span style={{
-      color: "#888",
-      fontSize: 14
-    }}>© FitConnect {new Date().getFullYear()}</span>
-  </footer>
-);
-
-const Layout = ({ children }) => (
-  <div style={{
-    minHeight: "100vh",
-    display: "flex",
-    flexDirection: "column",
-    background: "#fff"
-  }}>
-    <Header />
-    <div style={{ flex: 1 }}>
-      {children}
-    </div>
-    <Footer />
-  </div>
-);
-
-export default Layout;
+  )
+}
