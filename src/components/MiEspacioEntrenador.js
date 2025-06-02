@@ -10,6 +10,7 @@ import ServiceCard from "./ServiceCard"
 import EditarServicioModal from "./EditarServicioModal"
 import SessionCard from "./SessionCard"
 import ReprogramarModal from "./ReprogramarModal"
+import ClientDocumentCard from "./ClientDocumentCard"
 
 dayjs.extend(utc)
 
@@ -42,6 +43,10 @@ export default function MiEspacioEntrenador() {
   const [showReprogramar, setShowReprogramar] = useState(false)
   const [reservaToReschedule, setReservaToReschedule] = useState(null)
 
+  // — Estado para documentos —
+  const [clientesConReservas, setClientesConReservas] = useState([])
+  const [loadingDocuments, setLoadingDocuments] = useState(false)
+
   // — Cargar reservas al montar —
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -52,12 +57,42 @@ export default function MiEspacioEntrenador() {
       .then((data) => {
         setReservas(data)
         setLoadingReservas(false)
+        // Procesar clientes para documentos
+        processClientsForDocuments(data)
       })
       .catch((error) => {
         console.error("Error al cargar reservas:", error)
         setLoadingReservas(false)
       })
   }, [])
+
+  // — Procesar clientes para la sección de documentos —
+  const processClientsForDocuments = (reservasData) => {
+    // Agrupar reservas por cliente
+    const clientesMap = new Map()
+
+    reservasData.forEach((reserva) => {
+      // Solo incluir reservas aceptadas o finalizadas
+      const estadoValido = ["aceptado", "confirmed", "finalizado", "finished"].includes(reserva.estado?.toLowerCase())
+
+      if (estadoValido && reserva.cliente) {
+        const clienteId = reserva.cliente._id || reserva.cliente.id
+
+        if (!clientesMap.has(clienteId)) {
+          clientesMap.set(clienteId, {
+            cliente: reserva.cliente,
+            reservas: [],
+          })
+        }
+
+        clientesMap.get(clienteId).reservas.push(reserva)
+      }
+    })
+
+    // Convertir Map a Array
+    const clientesArray = Array.from(clientesMap.values())
+    setClientesConReservas(clientesArray)
+  }
 
   // — Cargar servicios del entrenador —
   const cargarServicios = async () => {
@@ -236,6 +271,12 @@ export default function MiEspacioEntrenador() {
     }
   }
 
+  // — Función para manejar documento subido —
+  const handleDocumentUploaded = () => {
+    // Recargar datos si es necesario
+    console.log("Documento subido exitosamente")
+  }
+
   return (
     <Layout>
       <div className="mi-espacio-entrenador">
@@ -304,11 +345,29 @@ export default function MiEspacioEntrenador() {
 
           {activeTab === "documentos" && (
             <div className="documentos-content">
-              <h2 className="section-title">Documentos</h2>
-              <p className="section-subtitle">Gestiona los documentos compartidos con tus clientes</p>
-              <div className="coming-soon">
-                <p>Próximamente: Subir y compartir documentos</p>
-              </div>
+              <h2 className="section-title">Mis documentos</h2>
+              <p className="section-subtitle">Planes de entrenamiento y recursos de tus clientes</p>
+
+              {loadingReservas ? (
+                <div className="loading-state">Cargando clientes...</div>
+              ) : (
+                <div className="clients-documents-container">
+                  {clientesConReservas.length === 0 ? (
+                    <div className="empty-state">
+                      <p>No tienes clientes con reservas activas para compartir documentos</p>
+                    </div>
+                  ) : (
+                    clientesConReservas.map((clienteData) => (
+                      <ClientDocumentCard
+                        key={clienteData.cliente._id || clienteData.cliente.id}
+                        cliente={clienteData.cliente}
+                        reservas={clienteData.reservas}
+                        onDocumentUploaded={handleDocumentUploaded}
+                      />
+                    ))
+                  )}
+                </div>
+              )}
             </div>
           )}
 
