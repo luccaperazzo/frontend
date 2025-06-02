@@ -1,19 +1,19 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';  // Usamos Router y Routes
-import Login from './components/Login';  // Asegúrate de que la ruta sea correcta
-import CrearCuenta from './components/CrearCuenta';  // Asegúrate de que la ruta sea correcta
-import ForgotPassword from './components/ForgotPassword';  // Ruta para la recuperación de contraseña
-import ResetPassword from './components/ResetPassword';  // Ruta para restablecer la contraseña
-import LoginSuccess from "./components/login-success";
-import LandingPage from './components/LandingPage';
-import SobreNosotros from "./components/SobreNosotros";
-import BusquedaEntrenadores from "./components/BusquedaEntrenadores";
-import PerfilEntrenador from "./components/PerfilEntrenador";
-import DetalleServicio from "./components/DetalleServicio";
-import SuccessPage from './components/SuccessPaymentPage';
-import MiEspacioCliente from './components/MiEspacioCliente';
-import MiEspacioEntrenador from './components/MiEspacioEntrenador';
-import MiEspacioEntrenadorMetrics from './components/MiEspacioEntrenadorMetrics';
+import Login from './components/auth/js/Login';  // Asegúrate de que la ruta sea correcta
+import CrearCuenta from './components/auth/js/CrearCuenta';  // Asegúrate de que la ruta sea correcta
+import ForgotPassword from './components/auth/js/ForgotPassword';  // Ruta para la recuperación de contraseña
+import ResetPassword from './components/auth/js/ResetPassword';  // Ruta para restablecer la contraseña
+import LoginSuccess from "./components/auth/js/login-success";
+import LandingPage from './components/common/js/LandingPage';
+import SobreNosotros from "./components/common/js/SobreNosotros";
+import BusquedaEntrenadores from "./components/trainers/js/BusquedaEntrenadores";
+import PerfilEntrenador from "./components/trainers/js/PerfilEntrenador";
+import DetalleServicio from "./components/common/js/DetalleServicio";
+import SuccessPage from './components/common/js/SuccessPaymentPage';
+import MiEspacioCliente from './components/user/not comps/js/MiEspacioCliente';
+import MiEspacioEntrenador from './components/user/not comps/js/MiEspacioEntrenador';
+import MiEspacioEntrenadorMetrics from './components/user/not comps/js/MiEspacioEntrenadorMetrics';
 
 const App = () => {
   return (
@@ -26,7 +26,6 @@ const App = () => {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/" element={<LandingPage/>} />
-          <Route path="/sobre-nosotros" element={<SobreNosotros />} />
           <Route path="/sobre-nosotros" element={<SobreNosotros />} />
           <Route path="/service/trainers" element={<BusquedaEntrenadores />} />
           <Route path="/trainers/:id" element={<PerfilEntrenador />} />

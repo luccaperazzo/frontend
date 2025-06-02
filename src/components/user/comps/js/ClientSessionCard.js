@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import dayjs from "dayjs"
-import "./ClientSessionCard.css"
+import "../css/ClientSessionCard.css" // Asegúrate de tener este CSS para estilos
 
 const ClientSessionCard = ({ reserva, onCancel }) => {
   const [loading, setLoading] = useState(false)

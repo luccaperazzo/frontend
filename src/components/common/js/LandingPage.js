@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Layout from "./Layout";
-import "./LandingPage.css";
+import Layout from "../../layout/js/Layout";
+import "../css/LandingPage.css"; // Asegúrate de tener este CSS para estilos
 import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {

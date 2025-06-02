@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Layout from "./Layout";
-import "./ResetPassword.css"; // Podés usar el mismo CSS que Forgot, cambiando las clases
+import Layout from "../../layout/js/Layout";
+import "../css/ResetPassword.css"; // Podés usar el mismo CSS que Forgot, cambiando las clases
 
 const ResetPassword = () => {
   const params = new URLSearchParams(window.location.search);

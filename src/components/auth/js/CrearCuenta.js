@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Layout from "./Layout";
-import "./CrearCuenta-CSS.css"; // Usá el CSS de abajo
+import Layout from "../../layout/js/Layout";
+import "../css/CrearCuenta-CSS.css"; // Usá el CSS de abajo
 
 const BARRIOS_CABA = [
   "Almagro", "Balvanera", "Barracas", "Belgrano", "Boedo",

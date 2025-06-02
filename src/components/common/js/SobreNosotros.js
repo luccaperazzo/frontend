@@ -1,4 +1,4 @@
-import Layout from "./Layout";
+import Layout from "../../layout/js/Layout";
 
 const equipo = [
   {

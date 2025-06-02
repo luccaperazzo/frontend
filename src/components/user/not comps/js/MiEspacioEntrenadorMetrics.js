@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Layout from "./Layout";
-import "./MiEspacioEntrenadorMetrics.css";
+import Layout from "../../../layout/js/Layout";
+import "../css/MiEspacioEntrenadorMetrics.css";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/es";
@@ -281,7 +281,7 @@ useEffect(() => {
                               </div>
                               <div>
                                 <div style={{ fontWeight: 600, color: "#1976d2", marginBottom: 2 }}>
-                                  Respuesta del entrenador
+                                  Tu respuesta
                                 </div>
                                 <div style={{ color: "#222", fontSize: 15, whiteSpace: "pre-line" }}>
                                   {r.reply.texto}

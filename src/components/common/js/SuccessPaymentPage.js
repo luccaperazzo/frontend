@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Layout from './Layout';
+import Layout from '../../layout/js/Layout';
 
 export default function SuccessPage() {
   return (

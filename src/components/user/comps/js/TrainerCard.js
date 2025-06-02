@@ -1,6 +1,6 @@
 "use client"
 import { useNavigate } from "react-router-dom"
-import "./TrainerCard.css"
+import "../css/TrainerCard.css"
 
 const TrainerCard = ({ trainer, onReview }) => {
   const navigate = useNavigate()

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import dayjs from "dayjs"
-import "./SessionCard.css"
+import "../css/SessionCard.css"
 
 const SessionCard = ({ reserva, onAction, onReprogramar }) => {
   const [loading, setLoading] = useState(false)

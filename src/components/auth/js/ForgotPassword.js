@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Layout from "./Layout";
-import "./ForgotPassword.css"; // Usá el CSS abajo
+import Layout from "../../layout/js/Layout";
+import "../css/ForgotPassword.css"; // Usá el CSS abajo
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");

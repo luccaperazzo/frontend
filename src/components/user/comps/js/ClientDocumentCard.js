@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import "./ClientDocumentCard.css"
+import "../css/ClientDocumentCard.css" // Asegúrate de tener este CSS para estilos
 
 const ClientDocumentCard = ({ cliente, reservas, onDocumentUploaded }) => {
   const [documents, setDocuments] = useState([])

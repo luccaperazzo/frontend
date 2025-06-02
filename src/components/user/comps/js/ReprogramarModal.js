@@ -5,7 +5,7 @@ import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import es from "date-fns/locale/es"
 import { registerLocale } from "react-datepicker"
-import "./ReprogramarModal.css"
+import "../css/ReprogramarModal.css"
 
 registerLocale("es", es)
 

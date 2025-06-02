@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import "./ServiceCard.css"
+import "../css/ServiceCard.css"
 
 const ServiceCard = ({ servicio, onEdit, onDelete, onTogglePublish }) => {
   const [loading, setLoading] = useState(false)

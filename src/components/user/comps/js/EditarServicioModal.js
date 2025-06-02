@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import "./CrearServicioModal.css"
+import { useState, useEffect } from "react"
+import "../css/CrearServicioModal.css"
 
-const CrearServicioModal = ({ isOpen, onClose, onServiceCreated }) => {
+const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = null, isEditing = false }) => {
   const [formData, setFormData] = useState({
     titulo: "",
     categoria: "",
@@ -26,7 +26,37 @@ const CrearServicioModal = ({ isOpen, onClose, onServiceCreated }) => {
     { value: 90, label: "1h 30m" },
   ]
 
-  const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+  // Cargar datos del servicio cuando se abre en modo edición
+  useEffect(() => {
+    if (isOpen && isEditing && servicio) {
+      setFormData({
+        titulo: servicio.titulo || "",
+        categoria: servicio.categoria || "",
+        precio: servicio.precio?.toString() || "",
+        duracion: servicio.duracion?.toString() || "",
+        descripcion: servicio.descripcion || "",
+        presencial: servicio.presencial !== undefined ? servicio.presencial : true,
+        disponibilidad: servicio.disponibilidad || {},
+      })
+      // Mostrar disponibilidad si ya tiene configurada
+      if (servicio.disponibilidad && Object.keys(servicio.disponibilidad).length > 0) {
+        setShowDisponibilidad(true)
+      }
+    } else if (isOpen && !isEditing) {
+      // Resetear formulario para crear nuevo servicio
+      setFormData({
+        titulo: "",
+        categoria: "",
+        precio: "",
+        duracion: "",
+        descripcion: "",
+        presencial: true,
+        disponibilidad: {},
+      })
+      setShowDisponibilidad(false)
+    }
+    setError("")
+  }, [isOpen, isEditing, servicio])
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -90,8 +120,14 @@ const CrearServicioModal = ({ isOpen, onClose, onServiceCreated }) => {
 
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch("http://localhost:3001/api/service/create", {
-        method: "POST",
+      const url = isEditing
+        ? `http://localhost:3001/api/service/${servicio._id}`
+        : "http://localhost:3001/api/service/create"
+
+      const method = isEditing ? "PUT" : "POST"
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -110,22 +146,24 @@ const CrearServicioModal = ({ isOpen, onClose, onServiceCreated }) => {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || "Error al crear el servicio")
+        throw new Error(data.error || `Error al ${isEditing ? "actualizar" : "crear"} el servicio`)
       }
 
-      // Resetear formulario
-      setFormData({
-        titulo: "",
-        categoria: "",
-        precio: "",
-        duracion: "",
-        descripcion: "",
-        presencial: true,
-        disponibilidad: {},
-      })
+      // Resetear formulario solo si es creación
+      if (!isEditing) {
+        setFormData({
+          titulo: "",
+          categoria: "",
+          precio: "",
+          duracion: "",
+          descripcion: "",
+          presencial: true,
+          disponibilidad: {},
+        })
+      }
 
       // Notificar al componente padre
-      onServiceCreated(data)
+      onServiceUpdated(data, isEditing)
       onClose()
     } catch (err) {
       setError(err.message)
@@ -140,7 +178,7 @@ const CrearServicioModal = ({ isOpen, onClose, onServiceCreated }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Crear servicio</h2>
+          <h2>{isEditing ? "Editar servicio" : "Crear servicio"}</h2>
           <button className="close-btn" onClick={onClose}>
             ✕
           </button>
@@ -275,7 +313,13 @@ const CrearServicioModal = ({ isOpen, onClose, onServiceCreated }) => {
           )}
 
           <button type="submit" className="submit-btn" disabled={loading}>
-            {loading ? "Creando..." : "Crear servicio"}
+            {loading
+              ? isEditing
+                ? "Actualizando..."
+                : "Creando..."
+              : isEditing
+                ? "Actualizar servicio"
+                : "Crear servicio"}
           </button>
         </form>
       </div>
@@ -386,4 +430,4 @@ const DisponibilidadSelector = ({ disponibilidad, onChange, duracion }) => {
   )
 }
 
-export default CrearServicioModal
+export default EditarServicioModal

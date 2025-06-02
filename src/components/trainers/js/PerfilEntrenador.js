@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import Layout from "./Layout";
-import "./PerfilEntrenador.css";
+import Layout from "../../layout/js/Layout";
+import "../css/PerfilEntrenador.css"; // Asegúrate de tener este CSS para estilos
 import { useNavigate } from "react-router-dom";
 
 function formateaTiempo(fecha) {

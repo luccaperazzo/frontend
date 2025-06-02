@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import Layout from "../Layout" // Ajusta la ruta según tu estructura
+import Layout from "../../../layout/js/Layout" // Ajusta la ruta según tu estructura
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
-import "./MiEspacioEntrenador.css"
-import ServiceCard from "./ServiceCard"
-import EditarServicioModal from "./EditarServicioModal"
-import SessionCard from "./SessionCard"
-import ReprogramarModal from "./ReprogramarModal"
-import ClientDocumentCard from "./ClientDocumentCard"
+import "../css/MiEspacioEntrenador.css"
+import ServiceCard from "../../comps/js/ServiceCard"
+import EditarServicioModal from "../../comps/js/EditarServicioModal"
+import SessionCard from "../../comps/js/SessionCard"
+import ReprogramarModal from "../../comps/js/ReprogramarModal"
+import ClientDocumentCard from "../../comps/js/ClientDocumentCard"
 
 dayjs.extend(utc)
 

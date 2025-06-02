@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import "./Login-CSS.css"
-import Layout from "./Layout"
+import "../css/Login-CSS.css"
+import Layout from "../../layout/js/Layout"
 
 const Login = () => {
   const [email, setEmail] = useState("")
@@ -40,13 +40,10 @@ const Login = () => {
 
       // 👇 REDIRECCIÓN AUTOMÁTICA SEGÚN EL ROLE 👇
       if (data.role === "entrenador") {
-        navigate("/entrenador/mi-espacio")
-      } else if (data.role === "cliente") {
-        navigate("/mi-espacio")
-      } else {
-        // Fallback por si hay otros roles o no se reconoce
         navigate("/login-success")
-      }
+      } else if (data.role === "cliente") {
+        navigate("/login-success")
+      } 
     } catch (err) {
       setError("Error de red o del servidor")
     }

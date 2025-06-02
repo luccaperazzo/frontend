@@ -1,6 +1,6 @@
 import React, { useEffect, useState , useRef} from "react";
 import { useParams } from "react-router-dom";
-import Layout from "./Layout";
+import Layout from "../../layout/js/Layout";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";            // ①

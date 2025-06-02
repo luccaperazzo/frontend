@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import "./ReviewModal.css"
+import "../css/ReviewModal.css"
 
 const ReviewModal = ({ trainer, onClose, onSuccess }) => {
   const [rating, setRating] = useState(5)
