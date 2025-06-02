@@ -248,9 +248,45 @@ useEffect(() => {
                           </div>
                           <div className="metrics-comment-text">{r.texto}</div>
                           {r.reply && (
-                            <div className="metrics-reply-block">
-                              <div className="metrics-reply-label">Respuesta del entrenador:</div>
-                              <div className="metrics-reply-text">{r.reply.texto}</div>
+                            <div
+                              className="metrics-reply-block"
+                              style={{
+                                background: "#f4f8ff",
+                                borderLeft: "4px solid #1976d2",
+                                borderRadius: 6,
+                                marginTop: 14,
+                                padding: "12px 16px",
+                                display: "flex",
+                                alignItems: "flex-start",
+                                gap: 12
+                              }}
+                            >
+                              <div
+                                style={{
+                                  width: 36,
+                                  height: 36,
+                                  borderRadius: "50%",
+                                  background: "#1976d2",
+                                  color: "#fff",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  fontWeight: 700,
+                                  fontSize: 18,
+                                  flexShrink: 0
+                                }}
+                                title="Entrenador"
+                              >
+                                🏋️
+                              </div>
+                              <div>
+                                <div style={{ fontWeight: 600, color: "#1976d2", marginBottom: 2 }}>
+                                  Respuesta del entrenador
+                                </div>
+                                <div style={{ color: "#222", fontSize: 15, whiteSpace: "pre-line" }}>
+                                  {r.reply.texto}
+                                </div>
+                              </div>
                             </div>
                           )}
                           {!r.reply && (
