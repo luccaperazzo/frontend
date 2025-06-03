@@ -8,12 +8,30 @@ const Header = () => {
   // Estado local para token y rol
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [role, setRole] = useState(localStorage.getItem("role"));
+  // Nuevo: Estado para nombre y apellido
+  const [userName, setUserName] = useState("");
+  const [userRole, setUserRole] = useState("");
 
   // Efecto para actualizar el estado cuando cambia la sesión
   useEffect(() => {
     const syncAuth = () => {
       setToken(localStorage.getItem("token"));
       setRole(localStorage.getItem("role"));
+      // Leer nombre y apellido del usuario desde localStorage
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          setUserName(`${user.nombre || ""} ${user.apellido || ""}`.trim());
+          setUserRole(user.role === "entrenador" ? "Entrenador" : user.role === "cliente" ? "Cliente" : "");
+        } catch {
+          setUserName("");
+          setUserRole("");
+        }
+      } else {
+        setUserName("");
+        setUserRole("");
+      }
     };
     window.addEventListener("storage", syncAuth);
     syncAuth();
@@ -23,8 +41,12 @@ const Header = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
+    localStorage.removeItem("user");
+    localStorage.removeItem("userId");
     setToken(null);
     setRole(null);
+    setUserName("");
+    setUserRole("");
     navigate("/login");
   };
 
@@ -38,7 +60,7 @@ const Header = () => {
       justifyContent: "space-between",
       padding: "0px 28px"
     }}>
-      <div style={{ display: "flex", alignItems: "center" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
         <button
           style={{
             background: "none",
@@ -61,6 +83,52 @@ const Header = () => {
             F
           </span>
         </button>
+        {/* Mostrar nombre y rol si está logueado */}
+        {token && userName && (
+          <span style={{
+            fontSize: "1.13rem",
+            fontWeight: 600,
+            color: "#222",
+            marginLeft: 8,
+            fontFamily: "'Segoe UI', 'Roboto', 'Arial', sans-serif",
+            display: "flex",
+            alignItems: "center"
+          }}>
+            <span style={{
+              color: "#888",
+              fontWeight: 500,
+              marginRight: 8,
+              fontSize: "1rem"
+            }}>
+              Logueado como:
+            </span>
+            <span style={{
+              color: "#007bff",
+              fontWeight: 700,
+              letterSpacing: "0.2px"
+            }}>
+              {userName}
+            </span>
+            <span style={{
+              display: "inline-block",
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: "#e0e0e0",
+              margin: "0 10px"
+            }} />
+            <span style={{
+              fontSize: "1rem",
+              fontWeight: 500,
+              color: "#666",
+              background: "#f2f6fa",
+              borderRadius: 5,
+              padding: "2px 10px"
+            }}>
+              {userRole}
+            </span>
+          </span>
+        )}
       </div>
       <nav style={{ display: "flex", alignItems: "center", gap: 28 }}>
         <button
