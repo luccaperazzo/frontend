@@ -4,7 +4,7 @@ import "../css/ResetPassword.css"; // Podés usar el mismo CSS que Forgot, cambi
 
 const ResetPassword = () => {
   const params = new URLSearchParams(window.location.search);
-  const token = params.get('token');
+  const token = params.get('token'); //Se obtiene de la URL
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [success, setSuccess] = useState("");
@@ -19,8 +19,11 @@ const ResetPassword = () => {
       setError("Las contraseñas no coinciden");
       return;
     }
-    if (password.length < 8) {
-      setError("La contraseña debe tener al menos 8 caracteres.");
+
+    // Validar fortaleza de la contraseña (igual que backend)
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setError("La contraseña debe tener al menos 8 caracteres, una letra mayúscula, un número y un carácter especial.");
       return;
     }
 
