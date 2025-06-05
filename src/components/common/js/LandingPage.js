@@ -3,10 +3,24 @@ import Layout from "../../layout/js/Layout";
 import "../css/LandingPage.css"; // Asegúrate de tener este CSS para estilos
 import { useNavigate } from "react-router-dom";
 
+/**
+ * Página principal (LandingPage)
+ * 
+ * Muestra:
+ * - Título y subtítulo de la plataforma.
+ * - Botones principales para buscar entrenadores o registrarse como entrenador.
+ * - Imagen ilustrativa.
+ * - Sección de entrenadores destacados (top trainers).
+ */
 const LandingPage = () => {
   const navigate = useNavigate();
   const [trainers, setTrainers] = useState([]);
+  const user = JSON.parse(localStorage.getItem("user")); // O usa tu contexto de auth
 
+  /**
+   * Efecto para cargar los entrenadores destacados al montar el componente.
+   * Llama a la API /api/trainers/top-trainers.
+   */
   useEffect(() => {
     fetch("http://localhost:3001/api/trainers/top-trainers")
       .then(res => res.json())
@@ -16,6 +30,7 @@ const LandingPage = () => {
 
   return (
     <Layout>
+      {/* Sección principal: título, subtítulo, botones y foto */}
       <main className="landing-main">
         <h1 className="landing-title">
           FITCONNECT
@@ -23,39 +38,42 @@ const LandingPage = () => {
         <p className="landing-subtitle">
           Encuentra Tu Entrenador Perfecto
         </p>
+        {/* Botones principales de acción */}
         <div className="landing-buttons">
-              <button
-                style={{
-                background: "#FF6B00", // o el color exacto del botón derecho
-                border: "none",
-                padding: "10px 20px",
-                color: "white",
-                fontSize: 16,
-                fontWeight: "bold", // más grueso que el 500 actual
-                cursor: "pointer",
-                borderRadius: "5px", // agregar bordes redondeados
-                }}
-                onClick={() => navigate('/service/trainers')}
-              >
-                Ver Entrenadores
-              </button>  
-              <button
-                style={{
-                background: "#FF6B00", // o el color exacto del botón derecho
-                border: "none",
-                padding: "10px 20px",
-                color: "white",
-                fontSize: 16,
-                fontWeight: "bold", // más grueso que el 500 actual
-                cursor: "pointer",
-                borderRadius: "5px", // agregar bordes redondeados
-                }}
-                  onClick={() => navigate('/register')}
-              >
-                Conviérte en Entrenador
-              </button>  
-              
+          <button
+            style={{
+              background: "#FF6B00",
+              border: "none",
+              padding: "10px 20px",
+              color: "white",
+              fontSize: 16,
+              fontWeight: "bold",
+              cursor: "pointer",
+              borderRadius: "5px",
+            }}
+            onClick={() => navigate('/service/trainers')}
+          >
+            Ver Entrenadores
+          </button>
+        {(!user || user.role !== "entrenador") && (
+          <button
+            style={{
+              background: "#FF6B00",
+              border: "none",
+              padding: "10px 20px",
+              color: "white",
+              fontSize: 16,
+              fontWeight: "bold",
+              cursor: "pointer",
+              borderRadius: "5px",
+            }}
+            onClick={() => navigate('/register')}
+          >
+            Conviérte en Entrenador
+          </button>
+        )}
         </div>
+        {/* Imagen ilustrativa */}
         <div className="landing-image-container">
           <img
             src="https://www.sportforster.de/out/ecsresponsive/img/laufschuh-ratgeber-neu-5.jpg"
@@ -65,16 +83,18 @@ const LandingPage = () => {
         </div>
       </main>
 
-      {/* Entrenadores destacados */}
+      {/* Sección de entrenadores destacados */}
       <section className="landing-trainers">
         <h3 className="landing-trainers-title">Entrenadores Destacados</h3>
         <div className="landing-trainers-cards">
+          {/* Si no hay entrenadores destacados */}
           {trainers.length === 0 && (
             <div className="no-trainers">No hay entrenadores destacados aún.</div>
           )}
+          {/* Renderiza cada entrenador destacado */}
           {trainers.map((t, i) => (
             <div className="trainer-card" key={i}>
-              {/* Avatar circular */}
+              {/* Avatar circular (foto o iniciales) */}
               {t.foto ? (
                 <img
                   src={t.foto}
@@ -98,6 +118,7 @@ const LandingPage = () => {
                   {(t.nombre?.charAt(0) || "") + (t.apellido?.charAt(0) || "")}
                 </div>
               )}
+              {/* Rating promedio en estrellas */}
               <div className="trainer-rating">
                 {Array.from({ length: 5 }).map((_, j) => (
                   <span key={j}>
@@ -108,15 +129,19 @@ const LandingPage = () => {
                   {typeof t.avgRating === "number" ? t.avgRating.toFixed(1) : ""}
                 </span>
               </div>
+              {/* Nombre y apellido */}
               <div className="trainer-name">
                 {t.nombre} {t.apellido}
               </div>
+              {/* Presentación breve */}
               <div className="trainer-presentacion">
                 {t.presentacion}
               </div>
+              {/* Zona de trabajo */}
               <div className="trainer-zona">
                 {t.zona}
               </div>
+              {/* Idiomas */}
               <div className="trainer-idiomas">
                 {Array.isArray(t.idiomas) ? t.idiomas.join(" / ") : t.idiomas}
               </div>

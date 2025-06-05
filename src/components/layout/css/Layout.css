@@ -165,9 +165,9 @@
 }
 
 .main-logout-btn:hover {
-  background: #ffeaea;
-  border-color: #dc3545;
-  color: #dc3545;
+  background: #ff0000;
+  border-color: #ffffff;
+  color: #ffffff;
 }
 
 .main-footer {
