@@ -395,14 +395,39 @@ const DisponibilidadSelector = ({ disponibilidad, onChange, duracion }) => {
           ))}
         </select>
 
-        <input
-          type="time"
+        {/* Hora de inicio */}
+        <select
           value={horaInicio}
-          onChange={(e) => setHoraInicio(e.target.value)}
+          onChange={e => setHoraInicio(e.target.value)}
           className="form-input-small"
-        />
+        >
+          <option value="">Hora inicio</option>
+          {Array.from({ length: 24 }, (_, h) =>
+            ["00", "15", "30", "45"].map(m => {
+              const val = `${h.toString().padStart(2, "0")}:${m}`;
+              return (
+                <option key={val} value={val}>{val}</option>
+              );
+            })
+          ).flat()}
+        </select>
 
-        <input type="time" value={horaFin} onChange={(e) => setHoraFin(e.target.value)} className="form-input-small" />
+        {/* Hora de fin */}
+        <select
+          value={horaFin}
+          onChange={e => setHoraFin(e.target.value)}
+          className="form-input-small"
+        >
+          <option value="">Hora fin</option>
+          {Array.from({ length: 24 }, (_, h) =>
+            ["00", "15", "30", "45"].map(m => {
+              const val = `${h.toString().padStart(2, "0")}:${m}`;
+              return (
+                <option key={val} value={val}>{val}</option>
+              );
+            })
+          ).flat()}
+        </select>
 
         <button type="button" onClick={agregarBloque} className="add-btn">
           Agregar

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Layout from "../../layout/js/Layout";
 import "../css/CrearCuenta-CSS.css"; // Usá el CSS de abajo
 
+// Lista de barrios de CABA para el campo "Zona" del formulario
 const BARRIOS_CABA = [
   "Almagro", "Balvanera", "Barracas", "Belgrano", "Boedo",
   "Caballito", "Chacarita", "Coghlan", "Colegiales", "Constitución",
@@ -15,14 +16,24 @@ const BARRIOS_CABA = [
   "Villa Riachuelo", "Villa Santa Rita", "Villa Soldati", "Villa Urquiza"
 ];
 
+// Lista de idiomas disponibles para entrenadores
 const IDIOMAS = [
   { value: "Español", label: "Español" },
   { value: "Inglés", label: "Inglés" },
   { value: "Portugués", label: "Portugués" }
 ];
 
+/**
+ * Componente CrearCuenta
+ * Permite a los usuarios registrarse como "usuario" o "entrenador".
+ * - Si elige "entrenador", se muestran campos adicionales (zona, idiomas, presentación).
+ * - Envía los datos al backend para crear la cuenta.
+ */
 const CrearCuenta = () => {
-  const [isTrainer, setIsTrainer] = useState(false);
+  // Estado para saber si el registro es como entrenador o usuario
+  const [isTrainer, setIsTrainer] = useState(false); // False, ya que la opción por defecto es "cliente"
+
+  // Estado para los datos del formulario
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
@@ -34,15 +45,24 @@ const CrearCuenta = () => {
     idiomas: [],
     presentacion: "",
   });
+
+  // Estado para mostrar errores en el formulario
   const [error, setError] = useState("");
+  // Estado para mostrar mensaje de éxito
   const [success, setSuccess] = useState("");
 
-  // Cambios en los campos
+  /**
+   * handleChange
+   * Actualiza el estado formData cuando cambia un campo del formulario.
+   */
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Cambios en idiomas (checkbox)
+  /**
+   * handleIdiomaToggle
+   * Agrega o quita un idioma del array de idiomas seleccionados.
+   */
   const handleIdiomaToggle = (value) => {
     let nuevosIdiomas = [...formData.idiomas];
     if (nuevosIdiomas.includes(value)) {
@@ -53,6 +73,11 @@ const CrearCuenta = () => {
     setFormData({ ...formData, idiomas: nuevosIdiomas });
   };
 
+  /**
+   * handleRoleToggle
+   * Cambia el rol entre usuario y entrenador.
+   * Si cambia, limpia los campos específicos de entrenador.
+   */
   const handleRoleToggle = (trainer) => {
     setIsTrainer(trainer);
     setFormData({
@@ -63,7 +88,11 @@ const CrearCuenta = () => {
     });
   };
 
-  // Submit
+  /**
+   * handleSubmit
+   * Envía el formulario al backend para registrar el usuario.
+   * Muestra mensajes de error o éxito según la respuesta.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -75,7 +104,7 @@ const CrearCuenta = () => {
         body: JSON.stringify({
           ...formData,
           role: isTrainer ? "entrenador" : "cliente",
-          idiomas: isTrainer ? formData.idiomas : undefined,
+          idiomas: isTrainer ? formData.idiomas : undefined, //Este campo se pasa aparte ya que tiene un handle específico
         }),
       });
 
@@ -86,7 +115,7 @@ const CrearCuenta = () => {
       }
 
       setSuccess("¡Cuenta creada con éxito!");
-      setFormData({
+      setFormData({           //Cuando crear con éxito, reiniciar el formulario
         nombre: "",
         apellido: "",
         email: "",
@@ -102,11 +131,13 @@ const CrearCuenta = () => {
     }
   };
 
+  // Renderizado del formulario de registro
   return (
     <Layout>
       <div className="register-root">
         <form className="register-form" onSubmit={handleSubmit}>
           <h2 className="register-title">Registrarse</h2>
+          {/* Botones para elegir el rol */}
           <div className="register-toggle">
             <button
               type="button"
@@ -123,6 +154,7 @@ const CrearCuenta = () => {
               Como entrenador
             </button>
           </div>
+          {/* Campos comunes para ambos roles */}
           <div className="register-group">
             <label>Nombre</label>
             <input
@@ -131,7 +163,7 @@ const CrearCuenta = () => {
               name="nombre"
               value={formData.nombre}
               onChange={handleChange}
-              required
+              required //Esto hace que lo tengas que completar sí o sí
             />
           </div>
           <div className="register-group">
@@ -189,7 +221,7 @@ const CrearCuenta = () => {
               required
             />
           </div>
-          {/* Campos solo para entrenador */}
+          {/* Campos solo visibles si el usuario elige "entrenador" */}
           {isTrainer && (
             <>
               <div className="register-group">
@@ -241,9 +273,12 @@ const CrearCuenta = () => {
               </div>
             </>
           )}
+          {/* Mensajes de error o éxito */}
           {error && <p className="register-error">{error}</p>}
           {success && <p className="register-success">{success}</p>}
-          <button className="register-btn" type="submit">
+          {/* Botón para enviar el formulario */}
+          <button className="register-btn" type="submit"> 
+            {/* activa la función handleSubmit */}
             Crear cuenta
           </button>
         </form>

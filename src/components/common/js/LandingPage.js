@@ -74,12 +74,39 @@ const LandingPage = () => {
           )}
           {trainers.map((t, i) => (
             <div className="trainer-card" key={i}>
+              {/* Avatar circular */}
+              {t.foto ? (
+                <img
+                  src={t.foto}
+                  alt={t.nombre}
+                  className="trainer-avatar-landing"
+                />
+              ) : (
+                <div
+                  className="trainer-avatar-landing"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "#f6c94822",
+                    color: "#222",
+                    fontWeight: 700,
+                    fontSize: 28,
+                    letterSpacing: 1,
+                  }}
+                >
+                  {(t.nombre?.charAt(0) || "") + (t.apellido?.charAt(0) || "")}
+                </div>
+              )}
               <div className="trainer-rating">
                 {Array.from({ length: 5 }).map((_, j) => (
                   <span key={j}>
                     {(t.avgRating ?? 0) >= j + 1 ? "★" : "☆"}
                   </span>
                 ))}
+                <span style={{ fontSize: 15, color: "#555", marginLeft: 6 }}>
+                  {typeof t.avgRating === "number" ? t.avgRating.toFixed(1) : ""}
+                </span>
               </div>
               <div className="trainer-name">
                 {t.nombre} {t.apellido}
