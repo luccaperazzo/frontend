@@ -28,7 +28,10 @@ const Login = () => {
         return
       }
 
-      // 👇 GUARDADO EN localStorage 👇
+          /**
+      Basicamente guardas en el localStorage token, role y userId y el user completo
+      Esto es para que puedas acceder a estos datos en cualquier parte de tu aplicación
+     */
       localStorage.setItem("token", data.token)
       localStorage.setItem("role", data.role)
 
