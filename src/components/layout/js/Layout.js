@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import "../css/Layout.css"; // Asegúrate de importar el CSS
 
 /**
  * Componente Header
@@ -67,237 +68,54 @@ const Header = () => {
     navigate("/login");
   };
 
-  // Media query para responsive
-  const responsiveStyle = `
-    @media (max-width: 700px) {
-      .fc-header {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        padding: 10px 8px !important;
-        gap: 10px !important;
-      }
-      .fc-header-left {
-        margin-bottom: 10px;
-        gap: 10px !important;
-      }
-      .fc-nav {
-        gap: 10px !important;
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        width: 100%;
-      }
-    }
-  `;
-
   return (
-    <>
-      <style>{responsiveStyle}</style>
-      <header
-        className="fc-header"
-        style={{
-          width: "100%",
-          maxWidth: 1400,
-          margin: "0 auto",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0px 28px",
-          flexWrap: "wrap",
-          boxSizing: "border-box"
-        }}
-      >
-        <div className="fc-header-left" style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <button
-            style={{
-              background: "none",
-              border: "none",
-              padding: 0,
-              margin: 0,
-              cursor: "pointer",
-              outline: "none"
-            }}
-            onClick={() => navigate('/')}
-            aria-label="Ir a la página principal"
-          >
-            <span style={{
-              fontWeight: 900,
-              fontSize: "2.5rem",
-              color: "#222",
-              letterSpacing: "2px",
-              marginRight: 28
-            }}>
-              F
-            </span>
-          </button>
-          {/* Mostrar nombre y rol si está logueado */}
-          {token && userName && (
-            <span style={{
-              fontSize: "1.13rem",
-              fontWeight: 600,
-              color: "#222",
-              marginLeft: 8,
-              fontFamily: "'Segoe UI', 'Roboto', 'Arial', sans-serif",
-              display: "flex",
-              alignItems: "center"
-            }}>
-              <span style={{
-                color: "#888",
-                fontWeight: 500,
-                marginRight: 8,
-                fontSize: "1rem"
-              }}>
-                Logueado como:
-              </span>
-              <span style={{
-                color: "#007bff",
-                fontWeight: 700,
-                letterSpacing: "0.2px"
-              }}>
-                {userName}
-              </span>
-              <span style={{
-                display: "inline-block",
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                background: "#e0e0e0",
-                margin: "0 10px"
-              }} />
-              <span style={{
-                fontSize: "1rem",
-                fontWeight: 500,
-                color: "#666",
-                background: "#f2f6fa",
-                borderRadius: 5,
-                padding: "2px 10px"
-              }}>
-                {userRole}
-              </span>
-            </span>
-          )}
-        </div>
-        <nav className="fc-nav" style={{ display: "flex", alignItems: "center", gap: 28, flexWrap: "wrap" }}>
-          <button
-            style={{
-              background: "none",
-              border: "none",
-              color: "#222",
-              fontSize: 16,
-              fontWeight: 500,
-              cursor: "pointer"
-            }}
-            onClick={() => navigate('/service/trainers')}
-          >
-            Entrenadores
-          </button>
-          <button
-            style={{
-              background: "none",
-              border: "none",
-              color: "#222",
-              fontSize: 16,
-              fontWeight: 500,
-              cursor: "pointer"
-            }}
-            onClick={() => navigate('/sobre-nosotros')}
-          >
-            Sobre Nosotros
-          </button>
+    <header className="main-header">
+      <div className="main-header-left" style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <button
+          className="main-logo-btn"
+          onClick={() => navigate('/')}
+          aria-label="Ir a la página principal"
+        >
+          <span className="main-logo-text">F</span>
+        </button>
+        {/* Mostrar nombre y rol si está logueado */}
+        {token && userName && (
+          <span className="main-user-info">
+            <span className="main-user-label">Logueado como:</span>
+            <span className="main-user-name">{userName}</span>
+            <span className="main-user-dot" />
+            <span className="main-user-role">{userRole}</span>
+          </span>
+        )}
+      </div>
+      <nav className="main-nav">
+        <button className="main-nav-btn" onClick={() => navigate('/service/trainers')}>Entrenadores</button>
+        <button className="main-nav-btn" onClick={() => navigate('/sobre-nosotros')}>Sobre Nosotros</button>
 
-          {/* 👇 Solo si está logueado como cliente 👇 */}
-          {token && role === "cliente" && (
-            <button
-              style={{
-                background: "none",
-                border: "none",
-                color: "#222",
-                fontSize: 16,
-                fontWeight: 500,
-                cursor: "pointer"
-              }}
-              onClick={() => navigate('/mi-espacio')}
-            >
-              Mi Espacio
-            </button>
-          )}
+        {/* 👇 Solo si está logueado como cliente 👇 */}
+        {token && role === "cliente" && (
+          <button className="main-nav-btn" onClick={() => navigate('/mi-espacio')}>Mi Espacio</button>
+        )}
 
-          {/* 👇 Solo si está logueado como entrenador 👇 */}
-          {token && role === "entrenador" && (
-            <button
-              style={{
-                background: "none",
-                border: "none",
-                color: "#222",
-                fontSize: 16,
-                fontWeight: 500,
-                cursor: "pointer"
-              }}
-              onClick={() => navigate('/entrenador/mi-espacio')}
-            >
-              Mi Espacio
-            </button>
-          )}
+        {/* 👇 Solo si está logueado como entrenador 👇 */}
+        {token && role === "entrenador" && (
+          <button className="main-nav-btn" onClick={() => navigate('/entrenador/mi-espacio')}>Mi Espacio</button>
+        )}
 
-          {/* 👇 Si NO está logueado 👇 */}
-          {!token && (
-            <>
-              <button
-                onClick={() => navigate('/login')}
-                style={{
-                  background: "#fff",
-                  color: "#111",
-                  fontWeight: 600,
-                  border: "1px solid #ddd",
-                  borderRadius: 6,
-                  padding: "8px 18px",
-                  fontSize: 15,
-                  cursor: "pointer",
-                  transition: "all .15s"
-                }}
-              >
-                Log In
-              </button>
-              <button
-                onClick={() => navigate('/register')}
-                style={{
-                  background: "#222",
-                  color: "#fff",
-                  fontWeight: 600,
-                  border: "none",
-                  borderRadius: 6,
-                  padding: "8px 18px",
-                  fontSize: 15,
-                  cursor: "pointer",
-                  transition: "all .15s"
-                }}
-              >
-                Registrarse
-              </button>
-            </>
-          )}
+        {/* 👇 Si NO está logueado 👇 */}
+        {!token && (
+          <>
+            <button className="main-login-btn" onClick={() => navigate('/login')}>Log In</button>
+            <button className="main-register-btn" onClick={() => navigate('/register')}>Registrarse</button>
+          </>
+        )}
 
-          {/* 👇 Si está logueado 👇 */}
-          {token && (
-            <button
-              onClick={handleLogout}
-              style={{
-                background: "#f7f7f7",
-                color: "#222",
-                fontWeight: 600,
-                border: "1.5px solid #ddd",
-                borderRadius: 6,
-                padding: "8px 18px",
-                fontSize: 15,
-                cursor: "pointer",
-                transition: "all .15s"
-              }}
-            >
-              Cerrar sesión
-            </button>
-          )}
-        </nav>
-      </header>
-    </>
+        {/* 👇 Si está logueado 👇 */}
+        {token && (
+          <button className="main-logout-btn" onClick={handleLogout}>Cerrar sesión</button>
+        )}
+      </nav>
+    </header>
   );
 };
 
@@ -306,30 +124,13 @@ const Header = () => {
  * Muestra el pie de página de la aplicación con el logo y el copyright.
  */
 const Footer = () => (
-  <footer style={{
-    borderTop: "1px solid #f2f2f2",
-    padding: "18px 0 16px",
-    width: "100%",
-    maxWidth: 1100,
-    margin: "0 auto",
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    flexWrap: "wrap"
-  }}>
+  <footer className="main-footer">
     <div style={{ display: "flex", alignItems: "center" }}>
-      <span style={{
-        fontWeight: 900,
-        fontSize: "2.5rem",
-        color: "#222",
-        letterSpacing: "2px",
-        marginLeft: 7
-      }}>F</span>
+      <span className="main-logo-text" style={{ marginLeft: 7 }}>F</span>
     </div>
-    <span style={{
-      color: "#888",
-      fontSize: 14
-    }}>© FitConnect {new Date().getFullYear()}</span>
+    <span style={{ color: "#888", fontSize: 14 }}>
+      © FitConnect {new Date().getFullYear()}
+    </span>
   </footer>
 );
 
