@@ -113,25 +113,29 @@
 /* -------- Responsive -------- */
 @media (max-width: 850px) {
   .busqueda-root {
-    flex-direction: column;
-    gap: 20px;
-    padding: 15px 2vw;
+    flex-direction: row; /* Mantén los filtros al costado */
+    gap: 10px;
+    padding: 10px 2vw;
+    align-items: flex-start;
   }
   .busqueda-filtros {
-    flex-direction: row;
-    max-width: 100vw;
-    min-width: unset;
-    width: 99vw;
-    margin-bottom: 11px;
-    gap: 16px;
-    overflow-x: auto;
-    padding: 14px 2vw 12px 2vw;
+    min-width: 120px;
+    max-width: 160px;
+    width: 38vw;
+    margin-bottom: 0;
+    gap: 11px;
+    overflow-x: unset;
+    padding: 10px 1vw 10px 1vw;
+  }
+  .busqueda-resultados {
+    flex: 1;
+    min-width: 0;
   }
   .filtros-reset {
     margin-top: 0;
   }
   .busqueda-cards {
-    justify-content: center;
+    justify-content: flex-start;
   }
 }
 

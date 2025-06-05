@@ -236,18 +236,8 @@ const buildQuery = () => {
           >
             Ver perfil
           </button>
-          {/* Mensaje informativo */}
-          <div style={{
-            marginTop: 8,
-            fontSize: "0.93rem",
-            color: "#444",
-            background: "#f7f7f7",
-            borderRadius: 5,
-            padding: "7px 8px"
-          }}>
-            Al contratar un servicio, el entrenador recibirá una notificación para aceptar o rechazar el servicio.
-          </div>
-        </div>
+      {/* Fin del botón Ver perfil */}
+    </div>
       ))}
     </div>
         </main>
