@@ -2,6 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../css/Layout.css"; // Asegúrate de importar el CSS
 
+// --- Añadir función para decodificar el JWT y chequear expiración ---
+function isTokenExpired(token) {
+  if (!token) return true;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    if (!payload.exp) return false;
+    // exp está en segundos desde epoch
+    return Date.now() >= payload.exp * 1000;
+  } catch {
+    return true;
+  }
+}
+
 /**
  * Componente Header
  * Muestra la cabecera de la aplicación, incluyendo:
@@ -52,6 +65,22 @@ const Header = () => {
     return () => window.removeEventListener("storage", syncAuth);
   }, [location]);
 
+  // --- Chequear expiración del token y forzar logout si está vencido ---
+  useEffect(() => {
+    if (token && isTokenExpired(token)) {
+      // Limpiar localStorage y forzar logout
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("user");
+      localStorage.removeItem("userId");
+      setToken(null);
+      setRole(null);
+      setUserName("");
+      setUserRole("");
+      navigate("/login");
+    }
+  }, [token, navigate, location]);
+
   /**
    * Cierra la sesión del usuario.
    * Elimina los datos de autenticación del localStorage y redirige al login.
@@ -89,19 +118,16 @@ const Header = () => {
         )}
       </div>
       <nav className="main-nav">
-        <button className="main-nav-btn" onClick={() => navigate('/service/trainers')}>Entrenadores</button>
         <button className="main-nav-btn" onClick={() => navigate('/sobre-nosotros')}>Sobre Nosotros</button>
-
+        <button className="main-nav-btn" onClick={() => navigate('/service/trainers')}>Entrenadores</button>
         {/* 👇 Solo si está logueado como cliente 👇 */}
         {token && role === "cliente" && (
           <button className="main-nav-btn" onClick={() => navigate('/mi-espacio')}>Mi Espacio</button>
         )}
-
         {/* 👇 Solo si está logueado como entrenador 👇 */}
         {token && role === "entrenador" && (
           <button className="main-nav-btn" onClick={() => navigate('/entrenador/mi-espacio')}>Mi Espacio</button>
         )}
-
         {/* 👇 Si NO está logueado 👇 */}
         {!token && (
           <>
@@ -109,7 +135,6 @@ const Header = () => {
             <button className="main-register-btn" onClick={() => navigate('/register')}>Registrarse</button>
           </>
         )}
-
         {/* 👇 Si está logueado 👇 */}
         {token && (
           <button className="main-logout-btn" onClick={handleLogout}>Cerrar sesión</button>
