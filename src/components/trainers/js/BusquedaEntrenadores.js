@@ -22,6 +22,7 @@ const idiomas = [
   { value: "Portugués", label: "Portugués" }
 ];
 const duraciones = [30, 45, 60, 90];
+const ratings = [1, 2, 3, 4, 5];
 
 const BusquedaEntrenadores = () => {
   const [filtros, setFiltros] = useState({
@@ -31,6 +32,7 @@ const BusquedaEntrenadores = () => {
     duracion: "",
     zona: "",
     idioma: [],
+    rating: "",
   });
   const [entrenadores, setEntrenadores] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -86,9 +88,13 @@ const buildQuery = () => {
           : prev.idioma.filter(idioma => idioma !== value),
       }));
     } else {
+      let newValue = value;
+      if (name === "rating") {
+        newValue = value === "" ? "" : parseInt(value);
+      }
       setFiltros(prev => ({
         ...prev,
-        [name]: value,
+        [name]: newValue,
       }));
     }
   };
@@ -102,6 +108,7 @@ const buildQuery = () => {
       duracion: "",
       zona: "",
       idioma: [],
+      rating: "",
     });
   };
 
@@ -142,6 +149,14 @@ const buildQuery = () => {
             {zonas.map(z => <option key={z} value={z}>{z}</option>)}
           </select>
 
+          <label>Promedio de rating</label>
+          <select name="rating" value={filtros.rating || ""} onChange={handleChange}>
+            <option value="">Cualquiera</option>
+            {ratings.map(r => (
+              <option key={r} value={r}>{r}+</option>
+            ))}
+          </select>
+
           <label>Idiomas</label>
           <div className="busqueda-idiomas">
             {idiomas.map(({ value, label }) => (
@@ -157,6 +172,7 @@ const buildQuery = () => {
               </label>
             ))}
           </div>
+
           <button className="filtros-reset" type="button" onClick={limpiarFiltros}>Limpiar</button>
         </aside>
 
