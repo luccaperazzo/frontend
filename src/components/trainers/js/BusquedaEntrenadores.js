@@ -24,6 +24,8 @@ const idiomas = [
 const duraciones = [30, 45, 60, 90];
 const ratings = [1, 2, 3, 4, 5];
 
+const PAGE_SIZE = 6;
+
 const BusquedaEntrenadores = () => {
   const [filtros, setFiltros] = useState({
     categoria: "",
@@ -36,6 +38,7 @@ const BusquedaEntrenadores = () => {
   });
   const [entrenadores, setEntrenadores] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate(); // ¡Esto debe estar en el componente!
 
   // Query string con los filtros aplicados
@@ -77,6 +80,18 @@ const buildQuery = () => {
       // eslint-disable-next-line
     }, [JSON.stringify(filtros)]);
 
+  // Reset page to 1 when filters change or entrenadores actualizan
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [JSON.stringify(filtros)]);
+
+  // Paginación: calcular entrenadores a mostrar
+  const totalPages = Math.ceil(entrenadores.length / PAGE_SIZE);
+  const paginatedEntrenadores = entrenadores.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
   // Handler de filtros
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -88,13 +103,9 @@ const buildQuery = () => {
           : prev.idioma.filter(idioma => idioma !== value),
       }));
     } else {
-      let newValue = value;
-      if (name === "rating") {
-        newValue = value === "" ? "" : parseInt(value);
-      }
       setFiltros(prev => ({
         ...prev,
-        [name]: newValue,
+        [name]: value,
       }));
     }
   };
@@ -152,9 +163,10 @@ const buildQuery = () => {
           <label>Promedio de rating</label>
           <select name="rating" value={filtros.rating || ""} onChange={handleChange}>
             <option value="">Cualquiera</option>
-            {ratings.map(r => (
-              <option key={r} value={r}>{r}+</option>
+            {ratings.slice(0, -1).map(r => (
+              <option key={r} value={String(r)}>{r}+</option>
             ))}
+            <option value="5+">5+</option>
           </select>
 
           <label>Idiomas</label>
@@ -183,79 +195,117 @@ const buildQuery = () => {
           {!loading && entrenadores.length === 0 && (
             <div className="busqueda-vacio">No hay entrenadores para los filtros seleccionados.</div>
           )}
-<div className="busqueda-cards">
-  {entrenadores.map((e, idx) => (
-    <div className="trainer-card" key={e._id || idx}>
-      {/* Imagen circular */}
-      <img
-        src={e.foto || "/foto-por-defecto.png"}
-        alt={e.nombre}
-        className="trainer-avatar"
-        style={{
-          width: 90,
-          height: 90,
-          borderRadius: "50%",
-          objectFit: "cover",
-          margin: "0 auto 12px auto",
-          display: "block"
-        }}
-      />
-      <div className="trainer-name" style={{ fontWeight: 700, fontSize: "1.2rem", marginBottom: 2 }}>
-        {e.nombre} {e.apellido}
-      </div>
-      {typeof e.avgRating === "number" && (
-              <div
+          <div className="busqueda-cards">
+            {paginatedEntrenadores.map((e, idx) => (
+              <div className="trainer-card" key={e._id || idx}>
+                {/* Imagen circular */}
+                <img
+                  src={e.foto || "/foto-por-defecto.png"}
+                  alt={e.nombre}
+                  className="trainer-avatar"
+                  style={{
+                    width: 90,
+                    height: 90,
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    margin: "0 auto 12px auto",
+                    display: "block"
+                  }}
+                />
+                <div className="trainer-name" style={{ fontWeight: 700, fontSize: "1.2rem", marginBottom: 2 }}>
+                  {e.nombre} {e.apellido}
+                </div>
+                {typeof e.avgRating === "number" && (
+                  <div
+                    style={{
+                      color: "#f6c948",
+                      fontSize: 16,
+                      fontWeight: 600,
+                      margin: "3px 0"
+                    }}
+                  >
+                    ★ {e.avgRating.toFixed(1)}{" "}
+                    <span style={{ fontWeight: 400, color: "#555" }}>
+                      ({e.totalRatings})
+                    </span>
+                  </div>
+                )}
+                {/* Zona */}
+                <div className="trainer-zona" style={{ color: "#888", fontSize: 14, marginBottom: 2 }}>
+                  {e.zona}
+                </div>
+                {/* Idiomas */}
+                <div className="trainer-idiomas" style={{ color: "#666", fontSize: 13, marginBottom: 5 }}>
+                  {e.idiomas?.join(" / ")}
+                </div>
+                {/* Botón Ver perfil */}
+                <button
+                  className="ver-perfil-btn"
+                  onClick={() => {
+                    if (!localStorage.getItem("token")) {
+                      window.location.href = "/login";
+                    } else {
+                      navigate(`/trainers/${e._id}`);
+                    }
+                  }}
+                  style={{
+                    width: "100%",
+                    background: "#222",
+                    color: "#fff",
+                    fontWeight: 700,
+                    fontSize: "1.08rem",
+                    borderRadius: 7,
+                    border: "none",
+                    padding: "9px 0",
+                    marginTop: 9,
+                    cursor: "pointer",
+                    transition: "background 0.14s"
+                  }}
+                >
+                  Ver perfil
+                </button>
+                {/* Fin del botón Ver perfil */}
+              </div>
+            ))}
+          </div>
+          {/* Barra de paginación */}
+          {totalPages > 1 && (
+            <div style={{ display: "flex", justifyContent: "center", marginTop: 24, gap: 12 }}>
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
                 style={{
-                  color: "#f6c948",
-                  fontSize: 16,
-                  fontWeight: 600,
-                  margin: "3px 0"
+                  padding: "8px 18px",
+                  borderRadius: 6,
+                  border: "1px solid #ccc",
+                  background: currentPage === 1 ? "#f4f4f4" : "#fff",
+                  color: "#333",
+                  cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                  fontWeight: 600
                 }}
               >
-                ★ {e.avgRating.toFixed(1)}{" "}
-                <span style={{ fontWeight: 400, color: "#555" }}>
-                  ({e.totalRatings})
-                </span>
-              </div>
-            )}
-      {/* Zona */}
-      <div className="trainer-zona" style={{ color: "#888", fontSize: 14, marginBottom: 2 }}>
-        {e.zona}
-      </div>
-      {/* Idiomas */}
-      <div className="trainer-idiomas" style={{ color: "#666", fontSize: 13, marginBottom: 5 }}>
-        {e.idiomas?.join(" / ")}
-      </div>
-      {/* Botón Ver perfil */}
-          <button
-            className="ver-perfil-btn"
-            onClick={() => {
-              if (!localStorage.getItem("token")) {
-                window.location.href = "/login";
-              } else {
-                navigate(`/trainers/${e._id}`);
-              }
-            }}
-            style={{
-              width: "100%",
-              background: "#222",
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: "1.08rem",
-              borderRadius: 7,
-              border: "none",
-              padding: "9px 0",
-              marginTop: 9,
-              cursor: "pointer",
-              transition: "background 0.14s"
-            }}
-          >
-            Ver perfil
-          </button>
-      {/* Fin del botón Ver perfil */}
-    </div>
-      ))}
-    </div>
+                Anterior
+              </button>
+              <span style={{ alignSelf: "center", fontWeight: 500 }}>
+                Página {currentPage} de {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                style={{
+                  padding: "8px 18px",
+                  borderRadius: 6,
+                  border: "1px solid #ccc",
+                  background: currentPage === totalPages ? "#f4f4f4" : "#fff",
+                  color: "#333",
+                  cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+                  fontWeight: 600
+                }}
+              >
+                Siguiente
+              </button>
+            </div>
+          )}
         </main>
       </div>
     </Layout>
