@@ -4,6 +4,12 @@ import Layout from "../../layout/js/Layout";
 import "../css/PerfilEntrenador.css"; // Asegúrate de tener este CSS para estilos
 import { useNavigate } from "react-router-dom";
 
+/**
+ * formateaTiempo
+ * Formatea una fecha en string relativo (ej: "Hace 2 días").
+ * @param {string|Date} fecha - Fecha a formatear.
+ * @returns {string} - Texto relativo al tiempo transcurrido.
+ */
 function formateaTiempo(fecha) {
   if (!fecha) return "";
   const f = new Date(fecha);
@@ -18,19 +24,32 @@ function formateaTiempo(fecha) {
 }
 
 const PerfilEntrenador = () => {
+  // Obtiene el id del entrenador desde la URL
   const { id } = useParams();
+
+  // Estado para los datos del entrenador
   const [entrenador, setEntrenador] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Estado para los servicios del entrenador
   const [servicios, setServicios] = useState([]);
   const [loadingServicios, setLoadingServicios] = useState(true);
 
+  // Estado para el tab seleccionado ("servicios" o "reseñas")
   const [tab, setTab] = useState("servicios");
+
+  // Estado para las reseñas del entrenador
   const [reseñas, setReseñas] = useState([]);
   const [loadingReseñas, setLoadingReseñas] = useState(false);
+  // Nuevo estado para mostrar todas las reseñas o solo 3
+  const [mostrarTodasReseñas, setMostrarTodasReseñas] = useState(false);
+
+  // Hook para navegación programática
   const navigate = useNavigate();
 
-  // Traer datos del entrenador
+  /**
+   * useEffect: Trae los datos del entrenador al montar el componente o cambiar el id.
+   */
   useEffect(() => {
     const fetchEntrenador = async () => {
       try {
@@ -46,7 +65,9 @@ const PerfilEntrenador = () => {
     fetchEntrenador();
   }, [id]);
 
-  // Traer servicios
+  /**
+   * useEffect: Trae los servicios del entrenador al montar o cambiar el id.
+   */
   useEffect(() => {
     const fetchServicios = async () => {
       setLoadingServicios(true);
@@ -63,7 +84,9 @@ const PerfilEntrenador = () => {
     fetchServicios();
   }, [id]);
 
-  // Traer reseñas al abrir tab "reseñas"
+  /**
+   * useEffect: Trae las reseñas solo cuando se selecciona el tab "reseñas".
+   */
   useEffect(() => {
     if (tab !== "reseñas") return;
     setLoadingReseñas(true);
@@ -74,6 +97,7 @@ const PerfilEntrenador = () => {
       .finally(() => setLoadingReseñas(false));
   }, [tab, id]);
 
+  // Renderiza mensaje de carga o error si corresponde
   if (loading) return <Layout><div>Cargando perfil...</div></Layout>;
   if (!entrenador) return <Layout><div>No se encontró el entrenador.</div></Layout>;
 
@@ -81,7 +105,7 @@ const PerfilEntrenador = () => {
     <Layout>
       <div className="perfil-root">
         <div className="perfil-row">
-          {/* Foto */}
+          {/* Foto del entrenador */}
           <div className="perfil-img">
             <img
               src={entrenador.foto || "/foto-por-defecto.png"}
@@ -89,7 +113,7 @@ const PerfilEntrenador = () => {
               style={{ borderRadius: 10, width: 280, height: 280, objectFit: "cover" }}
             />
           </div>
-          {/* Info principal */}
+          {/* Información principal del entrenador */}
           <div className="perfil-main">
             <h2>{entrenador.nombre} {entrenador.apellido}</h2>
             <div style={{ color: "#888", fontWeight: 500, marginBottom: 7 }}>
@@ -103,6 +127,7 @@ const PerfilEntrenador = () => {
               color: "#888",
               marginBottom: 6
             }}>
+              {/* Icono de ubicación */}
               <svg width="19" height="19" viewBox="0 0 20 20" fill="none" style={{ marginRight: 6, marginTop: 2 }}>
                 <circle cx="10" cy="9" r="3" stroke="#888" strokeWidth="1.5" fill="none"/>
                 <path d="M10 2.5C6 2.5 3 6 3 10.5c0 3.7 5.4 6.4 6.5 7 .4.2.6.2 1 0C11.6 16.9 17 14.2 17 10.5c0-4.5-3-8-7-8z"
@@ -110,14 +135,14 @@ const PerfilEntrenador = () => {
               </svg>
               <span>{entrenador.zona}{entrenador.zona ? ", BA" : ""}</span>
             </div>
-            {/* Rating */}
+            {/* Rating promedio */}
             <div style={{ fontSize: 14, color: "#555", marginBottom: 6 }}>
               <span style={{ color: "#f5c21d", fontWeight: 600 }}>
                 ★ {Number(entrenador.avgRating).toFixed(1)}
               </span>
               <span style={{ fontSize: 13, color: "#999", marginLeft: 8 }}>(promedio)</span>
             </div>
-            {/* Presentación */}
+            {/* Presentación del entrenador */}
             <div className="perfil-presentacion" style={{
               border: "1.5px solid #eee",
               borderRadius: 8,
@@ -127,6 +152,7 @@ const PerfilEntrenador = () => {
             }}>
               {entrenador.presentacion}
             </div>
+            {/* Idiomas */}
             <div className="perfil-info-extra" style={{ display: "flex", gap: 45 }}>
               <div>
                 <b>Idiomas</b>
@@ -159,6 +185,7 @@ const PerfilEntrenador = () => {
           fontWeight: 600,
           fontSize: "1.09rem"
         }}>
+          {/* Tab Servicios */}
           <div
             onClick={() => setTab("servicios")}
             style={{
@@ -171,6 +198,7 @@ const PerfilEntrenador = () => {
               cursor: "pointer"
             }}
           >Servicios</div>
+          {/* Tab Reseñas */}
           <div
             onClick={() => setTab("reseñas")}
             style={{
@@ -185,7 +213,7 @@ const PerfilEntrenador = () => {
           >Reseñas</div>
         </div>
 
-        {/* Tab Servicios */}
+        {/* Contenido del tab Servicios */}
         {tab === "servicios" && (
           <div style={{
             display: "flex",
@@ -217,6 +245,7 @@ const PerfilEntrenador = () => {
                     justifyContent: "space-between"
                   }}>
                   <div>
+                    {/* Título y descripción del servicio */}
                     <div style={{
                       fontWeight: 700,
                       fontSize: "1.19rem",
@@ -232,9 +261,11 @@ const PerfilEntrenador = () => {
                     justifyContent: "space-between",
                     marginTop: 16
                   }}>
+                    {/* Precio del servicio */}
                     <div style={{ fontWeight: 800, fontSize: "1.25rem" }}>
                       ${s.precio.toLocaleString("es-AR")}
                     </div>
+                    {/* Botón para ver más detalles del servicio */}
                     <button
                     style={{
                         padding: "7px 22px",
@@ -258,7 +289,7 @@ const PerfilEntrenador = () => {
           </div>
         )}
 
-        {/* Tab Reseñas */}
+        {/* Contenido del tab Reseñas */}
         {tab === "reseñas" && (
           <div style={{
             background: "#fff",
@@ -274,55 +305,80 @@ const PerfilEntrenador = () => {
             ) : reseñas.length === 0 ? (
               <div style={{ margin: 30, color: "#888" }}>Aún no hay reseñas para este entrenador.</div>
             ) : (
-              reseñas.map(r => (
-                <div key={r._id} style={{
-                  border: "1.3px solid #f2f2f2",
-                  borderRadius: 11,
-                  marginBottom: 18,
-                  padding: "14px 18px",
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 15,
-                  background: "#fff"
-                }}>
-                  {/* Avatar letra o imagen */}
-                  <div style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: "50%",
-                    background: "#f2f2f2",
-                    color: "#888",
-                    fontWeight: 700,
-                    fontSize: 19,
+              <>
+                {(mostrarTodasReseñas ? reseñas : reseñas.slice(0, 3)).map(r => (
+                  <div key={r._id} style={{
+                    border: "1.3px solid #f2f2f2",
+                    borderRadius: 11,
+                    marginBottom: 18,
+                    padding: "14px 18px",
                     display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginRight: 6,
-                    flexShrink: 0
+                    alignItems: "flex-start",
+                    gap: 15,
+                    background: "#fff"
                   }}>
-                    {r.cliente?.avatarUrl
-                      ? <img src={r.cliente.avatarUrl} alt="" style={{ width: 38, height: 38, borderRadius: "50%" }} />
-                      : (r.cliente?.nombre?.[0] || "U")}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                      <span style={{ fontWeight: 600 }}>{r.cliente?.nombre} {r.cliente?.apellido}</span>
-                      <span style={{ color: "#888", fontSize: 13, marginLeft: 6 }}>
-                        {formateaTiempo(r.createdAt)}
+                    {/* Avatar del cliente (letra o imagen) */}
+                    <div style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: "50%",
+                      background: "#f2f2f2",
+                      color: "#888",
+                      fontWeight: 700,
+                      fontSize: 19,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginRight: 6,
+                      flexShrink: 0
+                    }}>
+                      {r.cliente?.avatarUrl
+                        ? <img src={r.cliente.avatarUrl} alt="" style={{ width: 38, height: 38, borderRadius: "50%" }} />
+                        : (r.cliente?.nombre?.[0] || "U")}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      {/* Nombre del cliente y fecha */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                        <span style={{ fontWeight: 600 }}>{r.cliente?.nombre} {r.cliente?.apellido}</span>
+                        <span style={{ color: "#888", fontSize: 13, marginLeft: 6 }}>
+                          {formateaTiempo(r.createdAt)}
+                        </span>
+                      </div>
+                      {/* Texto de la reseña */}
+                      <div style={{ margin: "7px 0 7px 0", color: "#222" }}>{r.texto}</div>
+                    </div>
+                    {/* Estrellas de la reseña */}
+                    <div style={{ marginLeft: 8, minWidth: 86 }}>
+                      <span style={{ color: "#F6C948", fontSize: 20 }}>
+                        {Array.from({ length: 5 }).map((_, i) =>
+                          <span key={i}>{i < r.rating ? "★" : "☆"}</span>
+                        )}
                       </span>
                     </div>
-                    <div style={{ margin: "7px 0 7px 0", color: "#222" }}>{r.texto}</div>
                   </div>
-                  {/* Estrellas */}
-                  <div style={{ marginLeft: 8, minWidth: 86 }}>
-                    <span style={{ color: "#F6C948", fontSize: 20 }}>
-                      {Array.from({ length: 5 }).map((_, i) =>
-                        <span key={i}>{i < r.rating ? "★" : "☆"}</span>
-                      )}
-                    </span>
+                ))}
+                {/* Botón Ver más / Ver menos */}
+                {reseñas.length > 3 && (
+                  <div style={{ textAlign: "center", marginTop: 10 }}>
+                    <button
+                      style={{
+                        padding: "7px 22px",
+                        fontWeight: 600,
+                        fontSize: "1.06rem",
+                        borderRadius: 8,
+                        border: "1.3px solid #e3e3e3",
+                        background: "#fff",
+                        color: "#222",
+                        cursor: "pointer",
+                        transition: "background 0.14s"
+                      }}
+                      onClick={() => setMostrarTodasReseñas(v => !v)}
+                    >
+                      {mostrarTodasReseñas ? "Ver menos" : "Ver más"}
+                    </button>
                   </div>
-                </div>
-              ))
+                )}
+              </>
             )}
           </div>
         )}

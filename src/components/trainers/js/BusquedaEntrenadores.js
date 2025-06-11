@@ -3,7 +3,10 @@ import Layout from "../../layout/js/Layout";
 import "../css/BusquedaEntrenadores.css"; // Asegúrate de tener este CSS para estilos
 import { useNavigate } from "react-router-dom";
 
+// Listado de categorías disponibles para filtrar
 const categorias = ['Entrenamiento', 'Nutrición', 'Consultoría'];
+
+// Listado de zonas/barrio para filtrar entrenadores
 const zonas = [
   "Almagro", "Balvanera", "Barracas", "Belgrano", "Boedo",
   "Caballito", "Chacarita", "Coghlan", "Colegiales", "Constitución",
@@ -16,17 +19,29 @@ const zonas = [
   "Villa Luro", "Villa Ortúzar", "Villa Pueyrredón", "Villa Real",
   "Villa Riachuelo", "Villa Santa Rita", "Villa Soldati", "Villa Urquiza"
 ];
+
+// Idiomas disponibles para filtrar entrenadores
 const idiomas = [
   { value: "Español", label: "Español" },
   { value: "Inglés", label: "Inglés" },
   { value: "Portugués", label: "Portugués" }
 ];
+
+// Duraciones posibles de los servicios (en minutos)
 const duraciones = [30, 45, 60, 90];
+
+// Opciones de rating para el filtro
 const ratings = [1, 2, 3, 4, 5];
 
+// Cantidad de entrenadores por página (paginación)
 const PAGE_SIZE = 6;
 
+/**
+ * Componente principal para la búsqueda y filtrado de entrenadores.
+ * Permite aplicar filtros, ver resultados paginados y navegar al perfil de cada entrenador.
+ */
 const BusquedaEntrenadores = () => {
+  // Estado para los filtros aplicados
   const [filtros, setFiltros] = useState({
     categoria: "",
     presencial: "",
@@ -36,63 +51,82 @@ const BusquedaEntrenadores = () => {
     idioma: [],
     rating: "",
   });
+
+  // Estado para la lista de entrenadores obtenidos del backend
   const [entrenadores, setEntrenadores] = useState([]);
+
+  // Estado para mostrar indicador de carga
   const [loading, setLoading] = useState(false);
+
+  // Estado para la página actual de la paginación
   const [currentPage, setCurrentPage] = useState(1);
-  const navigate = useNavigate(); // ¡Esto debe estar en el componente!
 
-  // Query string con los filtros aplicados
-const buildQuery = () => {
-  const params = [];
-  for (let key in filtros) {
-    const value = filtros[key];
-    if (Array.isArray(value) && value.length) {
-      // Solo para idioma: eliminá duplicados
-      if (key === "idioma") {
-        const clean = [...new Set(value)]; // NO .toLowerCase()
-        params.push(`${key}=${clean.join(",")}`);
-      } else {
-        params.push(`${key}=${value.join(",")}`);
+  // Hook de navegación de React Router
+  const navigate = useNavigate();
+
+  /**
+   * Construye el query string para la API a partir de los filtros seleccionados.
+   * Devuelve una cadena como "?categoria=Entrenamiento&zona=Palermo&..."
+   */
+  const buildQuery = () => {
+    const params = [];
+    for (let key in filtros) {
+      const value = filtros[key];
+      if (Array.isArray(value) && value.length) {
+        // Solo para idioma: eliminá duplicados
+        if (key === "idioma") {
+          const clean = [...new Set(value)];
+          params.push(`${key}=${clean.join(",")}`);
+        } else {
+          params.push(`${key}=${value.join(",")}`);
+        }
+      } else if (value) {
+        params.push(`${key}=${encodeURIComponent(value)}`);
       }
-    } else if (value) {
-      params.push(`${key}=${encodeURIComponent(value)}`);
     }
-  }
-  return params.length ? "?" + params.join("&") : "";
-};
+    return params.length ? "?" + params.join("&") : "";
+  };
 
+  /**
+   * useEffect: Llama a la API para buscar entrenadores cada vez que cambian los filtros.
+   * Actualiza el estado de entrenadores y loading.
+   */
+  useEffect(() => {
+    const fetchEntrenadores = async () => {
+      setLoading(true);
+      const res = await fetch("http://localhost:3001/api/service/trainers" + buildQuery(), {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const data = await res.json();
+      setEntrenadores(data.entrenadores || []);
+      setLoading(false);
+    };
+    fetchEntrenadores();
+    // eslint-disable-next-line
+  }, [JSON.stringify(filtros)]);
 
-  // Buscar entrenadores cada vez que cambian los filtros
-    useEffect(() => {
-
-      const fetchEntrenadores = async () => {
-        setLoading(true);
-        const res = await fetch("http://localhost:3001/api/service/trainers" + buildQuery(), {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        const data = await res.json();
-        setEntrenadores(data.entrenadores || []);
-        setLoading(false);
-      };
-      fetchEntrenadores();
-      // eslint-disable-next-line
-    }, [JSON.stringify(filtros)]);
-
-  // Reset page to 1 when filters change or entrenadores actualizan
+  /**
+   * useEffect: Cuando cambian los filtros, resetea la página actual a 1.
+   */
   useEffect(() => {
     setCurrentPage(1);
   }, [JSON.stringify(filtros)]);
 
-  // Paginación: calcular entrenadores a mostrar
+  // Cálculo de la cantidad total de páginas según los resultados
   const totalPages = Math.ceil(entrenadores.length / PAGE_SIZE);
+
+  // Entrenadores a mostrar en la página actual
   const paginatedEntrenadores = entrenadores.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   );
 
-  // Handler de filtros
+  /**
+   * Handler para cambios en los filtros.
+   * Actualiza el estado de filtros según el input modificado.
+   */
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === "checkbox") {
@@ -110,7 +144,9 @@ const buildQuery = () => {
     }
   };
 
-  // Limpiar filtros
+  /**
+   * Limpia todos los filtros y los resetea a su valor inicial.
+   */
   const limpiarFiltros = () => {
     setFiltros({
       categoria: "",
@@ -126,16 +162,18 @@ const buildQuery = () => {
   return (
     <Layout>
       <div className="busqueda-root">
-        {/* Filtros */}
+        {/* Panel lateral de filtros */}
         <aside className="busqueda-filtros">
           <h2>Filtros</h2>
 
+          {/* Filtro de categoría */}
           <label>Categoría</label>
           <select name="categoria" value={filtros.categoria} onChange={handleChange}>
             <option value="">Todas</option>
             {categorias.map(cat => <option key={cat} value={cat}>{cat}</option>)}
           </select>
 
+          {/* Filtro de modalidad */}
           <label>Modalidad</label>
           <select name="presencial" value={filtros.presencial} onChange={handleChange}>
             <option value="">Ambas</option>
@@ -143,9 +181,11 @@ const buildQuery = () => {
             <option value="virtual">Virtual</option>
           </select>
 
+          {/* Filtro de precio máximo */}
           <label>Precio máximo</label>
           <input name="precioMax" type="number" min="0" value={filtros.precioMax} onChange={handleChange} />
 
+          {/* Filtro de duración */}
           <label>Duración (min)</label>
           <select name="duracion" value={filtros.duracion} onChange={handleChange}>
             <option value="">Cualquiera</option>
@@ -154,12 +194,14 @@ const buildQuery = () => {
             ))}
           </select>
 
+          {/* Filtro de zona */}
           <label>Zona</label>
           <select name="zona" value={filtros.zona} onChange={handleChange}>
             <option value="">Todas</option>
             {zonas.map(z => <option key={z} value={z}>{z}</option>)}
           </select>
 
+          {/* Filtro de rating promedio */}
           <label>Promedio de rating</label>
           <select name="rating" value={filtros.rating || ""} onChange={handleChange}>
             <option value="">Cualquiera</option>
@@ -169,6 +211,7 @@ const buildQuery = () => {
             <option value="5+">5+</option>
           </select>
 
+          {/* Filtro de idiomas */}
           <label>Idiomas</label>
           <div className="busqueda-idiomas">
             {idiomas.map(({ value, label }) => (
@@ -185,20 +228,24 @@ const buildQuery = () => {
             ))}
           </div>
 
+          {/* Botón para limpiar todos los filtros */}
           <button className="filtros-reset" type="button" onClick={limpiarFiltros}>Limpiar</button>
         </aside>
 
-        {/* Resultados */}
+        {/* Sección principal de resultados */}
         <main className="busqueda-resultados">
           <h2>Entrenadores encontrados</h2>
+          {/* Indicador de carga */}
           {loading && <div className="busqueda-loading">Cargando...</div>}
+          {/* Mensaje si no hay resultados */}
           {!loading && entrenadores.length === 0 && (
             <div className="busqueda-vacio">No hay entrenadores para los filtros seleccionados.</div>
           )}
+          {/* Cards de entrenadores */}
           <div className="busqueda-cards">
             {paginatedEntrenadores.map((e, idx) => (
               <div className="trainer-card" key={e._id || idx}>
-                {/* Imagen circular */}
+                {/* Imagen circular del entrenador */}
                 <img
                   src={e.foto || "/foto-por-defecto.png"}
                   alt={e.nombre}
@@ -212,9 +259,11 @@ const buildQuery = () => {
                     display: "block"
                   }}
                 />
+                {/* Nombre y apellido */}
                 <div className="trainer-name" style={{ fontWeight: 700, fontSize: "1.2rem", marginBottom: 2 }}>
                   {e.nombre} {e.apellido}
                 </div>
+                {/* Rating promedio y cantidad de ratings */}
                 {typeof e.avgRating === "number" && (
                   <div
                     style={{
@@ -230,22 +279,22 @@ const buildQuery = () => {
                     </span>
                   </div>
                 )}
-                {/* Zona */}
+                {/* Zona del entrenador */}
                 <div className="trainer-zona" style={{ color: "#888", fontSize: 14, marginBottom: 2 }}>
                   {e.zona}
                 </div>
-                {/* Idiomas */}
+                {/* Idiomas del entrenador */}
                 <div className="trainer-idiomas" style={{ color: "#666", fontSize: 13, marginBottom: 5 }}>
                   {e.idiomas?.join(" / ")}
                 </div>
-                {/* Botón Ver perfil */}
+                {/* Botón para ver el perfil del entrenador */}
                 <button
                   className="ver-perfil-btn"
                   onClick={() => {
                     if (!localStorage.getItem("token")) {
                       window.location.href = "/login";
                     } else {
-                      navigate(`/trainers/${e._id}`);
+                      navigate(`/trainers/${e._id}`); //le pasas el ID del trainer implicitamente en la URL
                     }
                   }}
                   style={{
