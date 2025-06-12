@@ -5,6 +5,7 @@ import CrearCuenta from './components/auth/js/CrearCuenta';  // Asegúrate de qu
 import ForgotPassword from './components/auth/js/ForgotPassword';  // Ruta para la recuperación de contraseña
 import ResetPassword from './components/auth/js/ResetPassword';  // Ruta para restablecer la contraseña
 import LoginSuccess from "./components/auth/js/login-success";
+import CancelPaymentPage from "./components/common/js/CancelPaymentPage";
 import LandingPage from './components/common/js/LandingPage';
 import SobreNosotros from "./components/common/js/SobreNosotros";
 import BusquedaEntrenadores from "./components/trainers/js/BusquedaEntrenadores";
@@ -34,6 +35,7 @@ const App = () => {
           <Route path="/mi-espacio" element={<MiEspacioCliente />} />
           <Route path="/entrenador/mi-espacio" element={<MiEspacioEntrenador />} />
           <Route path="/metrics" element={<MiEspacioEntrenadorMetrics />} />
+          <Route path="/cancel" element={<CancelPaymentPage />} />
         </Routes>
       </div>
     </Router>

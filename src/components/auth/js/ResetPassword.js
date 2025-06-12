@@ -4,7 +4,7 @@ import "../css/ResetPassword.css"; // Podés usar el mismo CSS que Forgot, cambi
 
 const ResetPassword = () => {
   const params = new URLSearchParams(window.location.search);
-  const token = params.get('token'); //Se obtiene de la URL
+  const token = params.get('token'); //Se obtiene de la URL el TOKEN, para usarse como BODY para el POST
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [success, setSuccess] = useState("");
