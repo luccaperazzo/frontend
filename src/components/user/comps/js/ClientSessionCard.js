@@ -27,14 +27,19 @@ const ClientSessionCard = ({ reserva, onCancel }) => {
       .substring(0, 2)
   }
 
+  // Ajusta la fecha sumando 3 horas (UTC-3)
+  const ajustarZonaHoraria = (fecha) => {
+    return dayjs(fecha).add(3, "hour")
+  }
+
   // Función para formatear la fecha
   const formatearFecha = (fecha) => {
-    return dayjs(fecha).format("DD/MM/YYYY")
+    return ajustarZonaHoraria(fecha).format("DD/MM/YYYY")
   }
 
   // Función para formatear la hora
   const formatearHora = (fecha) => {
-    return dayjs(fecha).format("HH:mm")
+    return ajustarZonaHoraria(fecha).format("HH:mm")
   }
 
   // Función para obtener el color y texto del estado
