@@ -128,6 +128,7 @@ const Header = () => {
           >
             {/* Mini avatar solo si es entrenador y tiene avatarUrl */}
             {role === "entrenador" && (
+              console.log("Avatar URL:", avatarUrl),
               avatarUrl ? (
                 <img
                   src={avatarUrl.startsWith("/uploads") ? `http://localhost:3001${avatarUrl}` : avatarUrl}

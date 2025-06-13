@@ -73,6 +73,31 @@ const LandingPage = () => {
           </button>
         )}
         </div>
+        {/* Botón para poblar la base de datos en desarrollo */}
+        {process.env.NODE_ENV !== 'production' && (
+          <button
+            style={{
+              background: '#007bff',
+              border: 'none',
+              padding: '10px 20px',
+              color: 'white',
+              fontSize: 16,
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              borderRadius: '5px',
+              marginTop: 10,
+              marginLeft: 10
+            }}
+            onClick={async () => {
+              const res = await fetch('http://localhost:3001/api/dev/seed', { method: 'POST' });
+              const data = await res.json();
+              alert(data.message || 'Operación realizada');
+              window.location.reload();
+            }}
+          >
+            Poblar Base de Datos (DEV)
+          </button>
+        )}
         {/* Imagen ilustrativa */}
         <div className="landing-image-container">
           <img
@@ -118,7 +143,7 @@ const LandingPage = () => {
                     fontSize: 28,
                     letterSpacing: 1,
                   }}
-                >
+                > {/* si no existe el nombre o apellido, se usan las iniciales */}
                   {(t.nombre?.charAt(0) || "") + (t.apellido?.charAt(0) || "")}
                 </div>
               )}
