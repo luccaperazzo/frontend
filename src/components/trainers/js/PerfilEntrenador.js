@@ -159,13 +159,14 @@ const PerfilEntrenador = () => {
                   stroke="#888" strokeWidth="1.5" fill="none"/>
               </svg>
               <span>{entrenador.zona}{entrenador.zona ? ", BA" : ""}</span>
-            </div>
-            {/* Rating promedio */}
+            </div>            {/* Rating promedio */}
             <div style={{ fontSize: 14, color: "#555", marginBottom: 6 }}>
               <span style={{ color: "#f5c21d", fontWeight: 600 }}>
                 ★ {Number(entrenador.avgRating).toFixed(1)}
               </span>
-              <span style={{ fontSize: 13, color: "#999", marginLeft: 8 }}>(promedio)</span>
+              <span style={{ fontSize: 13, color: "#999", marginLeft: 8 }}>
+                ({entrenador.totalRatings || 0} {entrenador.totalRatings === 1 ? 'calificación' : 'calificaciones'})
+              </span>
             </div>
             {/* Presentación del entrenador */}
             <div className="perfil-presentacion" style={{
