@@ -44,7 +44,10 @@ const CrearCuenta = () => {
     zona: "",
     idiomas: [],
     presentacion: "",
+    role: "cliente" // <-- agregar role al estado
   });
+  const [avatar, setAvatar] = useState(null); // Estado para la imagen de perfil
+  const [avatarPreview, setAvatarPreview] = useState(null); // <-- Nuevo estado para preview
 
   // Estado para mostrar errores en el formulario
   const [error, setError] = useState("");
@@ -85,7 +88,19 @@ const CrearCuenta = () => {
       zona: "",
       idiomas: [],
       presentacion: "",
+      role: trainer ? "entrenador" : "cliente" // <-- actualizar role según selección
     });
+  };
+
+  // Actualizar preview cuando seleccionás una imagen
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    setAvatar(file);
+    if (file) {
+      setAvatarPreview(URL.createObjectURL(file));
+    } else {
+      setAvatarPreview(null);
+    }
   };
 
   /**
@@ -98,14 +113,22 @@ const CrearCuenta = () => {
     setError("");
     setSuccess("");
     try {
+      const formDataToSend = new FormData();
+      Object.keys(formData).forEach(key => {
+        // Si el campo es un array (idiomas), agregalo como JSON string
+        if (Array.isArray(formData[key])) {
+          formDataToSend.append(key, JSON.stringify(formData[key]));
+        } else {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+      if (isTrainer && avatar) {
+        formDataToSend.append('avatar', avatar);
+      }
+
       const response = await fetch("http://localhost:3001/api/auth/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          role: isTrainer ? "entrenador" : "cliente",
-          idiomas: isTrainer ? formData.idiomas : undefined, //Este campo se pasa aparte ya que tiene un handle específico
-        }),
+        body: formDataToSend,
       });
 
       const data = await response.json();
@@ -115,7 +138,7 @@ const CrearCuenta = () => {
       }
 
       setSuccess("¡Cuenta creada con éxito!");
-      setFormData({           //Cuando crear con éxito, reiniciar el formulario
+      setFormData({
         nombre: "",
         apellido: "",
         email: "",
@@ -125,7 +148,10 @@ const CrearCuenta = () => {
         zona: "",
         idiomas: [],
         presentacion: "",
+        role: "cliente" // se reinicia luego de crear cuenta
       });
+      setAvatar(null);
+      setAvatarPreview(null); // Limpiar preview
     } catch (err) {
       setError("Error de red o del servidor. Intenta de nuevo.");
     }
@@ -271,11 +297,55 @@ const CrearCuenta = () => {
                   placeholder="Soy entrenador personal certificado..."
                 />
               </div>
+              <div className="register-group">
+                <label>Foto de perfil</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  required
+                />
+                {/* Preview de la imagen seleccionada */}
+                {avatarPreview && (
+                  <div style={{ marginTop: 10 }}>
+                    <img
+                      src={avatarPreview}
+                      alt="Preview"
+                      style={{
+                        width: 90,
+                        height: 90,
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                        border: "2px solid #f6c948"
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             </>
           )}
           {/* Mensajes de error o éxito */}
           {error && <p className="register-error">{error}</p>}
-          {success && <p className="register-success">{success}</p>}
+          {success && (
+            <div style={{ textAlign: "center", margin: "18px 0" }}>
+              <p className="register-success">{success}</p>
+              {/* Mostrar imagen subida si el backend la devuelve */}
+              {avatarPreview && (
+                <img
+                  src={avatarPreview}
+                  alt="Avatar subido"
+                  style={{
+                    width: 90,
+                    height: 90,
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    border: "2px solid #f6c948",
+                    marginTop: 10
+                  }}
+                />
+              )}
+            </div>
+          )}
           {/* Botón para enviar el formulario */}
           <button className="register-btn" type="submit"> 
             {/* activa la función handleSubmit */}

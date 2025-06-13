@@ -95,9 +95,13 @@ const LandingPage = () => {
           {trainers.map((t, i) => (
             <div className="trainer-card" key={i}>
               {/* Avatar circular (foto o iniciales) */}
-              {t.foto ? (
+              {t.avatarUrl ? (
                 <img
-                  src={t.foto}
+                  src={
+                    t.avatarUrl.startsWith('http')
+                      ? t.avatarUrl
+                      : `http://localhost:3001${t.avatarUrl}`
+                  }
                   alt={t.nombre}
                   className="trainer-avatar-landing"
                 />

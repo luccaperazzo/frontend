@@ -30,9 +30,10 @@ const Header = () => {
   // Estado local para token y rol
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [role, setRole] = useState(localStorage.getItem("role"));
-  // Nuevo: Estado para nombre y apellido
+  // Nuevo: Estado para nombre, rol y avatar
   const [userName, setUserName] = useState("");
   const [userRole, setUserRole] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState(null);
 
   // Efecto para actualizar el estado cuando cambia la sesión
   useEffect(() => {
@@ -44,20 +45,23 @@ const Header = () => {
     const syncAuth = () => {
       setToken(localStorage.getItem("token"));
       setRole(localStorage.getItem("role"));
-      // Leer nombre y apellido del usuario desde localStorage
+      // Leer nombre, apellido y avatarUrl del usuario desde localStorage
       const userStr = localStorage.getItem("user");
       if (userStr) {
         try {
           const user = JSON.parse(userStr);
           setUserName(`${user.nombre || ""} ${user.apellido || ""}`.trim());
           setUserRole(user.role === "entrenador" ? "Entrenador" : user.role === "cliente" ? "Cliente" : "");
+          setAvatarUrl(user.avatarUrl || null);
         } catch {
           setUserName("");
           setUserRole("");
+          setAvatarUrl(null);
         }
       } else {
         setUserName("");
         setUserRole("");
+        setAvatarUrl(null);
       }
     };
     window.addEventListener("storage", syncAuth);
@@ -77,6 +81,7 @@ const Header = () => {
       setRole(null);
       setUserName("");
       setUserRole("");
+      setAvatarUrl(null);
       navigate("/login");
     }
   }, [token, navigate, location]);
@@ -94,6 +99,7 @@ const Header = () => {
     setRole(null);
     setUserName("");
     setUserRole("");
+    setAvatarUrl(null);
     navigate("/login");
   };
 
@@ -107,13 +113,65 @@ const Header = () => {
         >
           <span className="main-logo-text">F</span>
         </button>
-        {/* Mostrar nombre y rol si está logueado */}
+        {/* Mostrar nombre, avatar y rol si está logueado */}
         {token && userName && (
-          <span className="main-user-info">
-            <span className="main-user-label">Logueado como:</span>
-            <span className="main-user-name">{userName}</span>
-            <span className="main-user-dot" />
-            <span className="main-user-role">{userRole}</span>
+          <span
+            className="main-user-info"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              fontSize: 13,
+              minHeight: 32,
+              padding: "2px 0"
+            }}
+          >
+            {/* Mini avatar solo si es entrenador y tiene avatarUrl */}
+            {role === "entrenador" && (
+              avatarUrl ? (
+                <img
+                  src={avatarUrl.startsWith("/uploads") ? `http://localhost:3001${avatarUrl}` : avatarUrl}
+                  alt="Avatar"
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    border: "1.5px solid #f6c948",
+                    marginRight: 4
+                  }}
+                />
+              ) : (
+                // Mostrar iniciales si no hay avatar
+                <span
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: "50%",
+                    background: "#f6c948",
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: 700,
+                    fontSize: 13,
+                    marginRight: 4,
+                    border: "1.5px solid #f6c948"
+                  }}
+                >
+                  {userName
+                    .split(" ")
+                    .map(n => n[0])
+                    .join("")
+                    .toUpperCase()
+                    .slice(0, 2)}
+                </span>
+              )
+            )}
+            <span className="main-user-label" style={{ fontSize: 12 }}>Logueado como:</span>
+            <span className="main-user-name" style={{ fontWeight: 600, fontSize: 14 }}>{userName}</span>
+            <span className="main-user-dot" style={{ width: 7, height: 7, margin: "0 3px" }} />
+            <span className="main-user-role" style={{ fontSize: 12 }}>{userRole}</span>
           </span>
         )}
       </div>

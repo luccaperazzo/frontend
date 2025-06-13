@@ -247,7 +247,11 @@ const BusquedaEntrenadores = () => {
               <div className="trainer-card" key={e._id || idx}>
                 {/* Imagen circular del entrenador */}
                 <img
-                  src={e.foto || "/foto-por-defecto.png"}
+                  src={
+                    e.avatarUrl
+                      ? (e.avatarUrl.startsWith("http") ? e.avatarUrl : `http://localhost:3001${e.avatarUrl}`)
+                      : "/foto-por-defecto.png"
+                  }
                   alt={e.nombre}
                   className="trainer-avatar"
                   style={{

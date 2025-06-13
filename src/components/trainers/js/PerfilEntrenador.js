@@ -108,8 +108,9 @@ const PerfilEntrenador = () => {
           {/* Foto del entrenador */}
           <div className="perfil-img">
             <img
-              src={entrenador.foto || "/foto-por-defecto.png"}
-              alt={entrenador.nombre}
+              src={entrenador.avatarUrl ? `http://localhost:3001${entrenador.avatarUrl}` : '/default-avatar.png'}
+              alt="Avatar"
+              className="trainer-avatar-large"
               style={{ borderRadius: 10, width: 280, height: 280, objectFit: "cover" }}
             />
           </div>
