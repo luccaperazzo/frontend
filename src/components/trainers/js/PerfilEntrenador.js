@@ -104,15 +104,39 @@ const PerfilEntrenador = () => {
   return (
     <Layout>
       <div className="perfil-root">
-        <div className="perfil-row">
-          {/* Foto del entrenador */}
+        <div className="perfil-row">          {/* Foto del entrenador */}
           <div className="perfil-img">
-            <img
-              src={entrenador.avatarUrl ? `http://localhost:3001${entrenador.avatarUrl}` : '/default-avatar.png'}
-              alt="Avatar"
-              className="trainer-avatar-large"
-              style={{ borderRadius: 10, width: 280, height: 280, objectFit: "cover" }}
-            />
+            {entrenador.avatarUrl ? (
+              <img
+                src={
+                  entrenador.avatarUrl.startsWith('http')
+                    ? entrenador.avatarUrl
+                    : `http://localhost:3001${entrenador.avatarUrl}`
+                }
+                alt={`${entrenador.nombre} ${entrenador.apellido}`}
+                className="trainer-avatar-large"
+                style={{ borderRadius: 10, width: 280, height: 280, objectFit: "cover" }}
+              />
+            ) : (
+              <div
+                className="trainer-avatar-large"
+                style={{
+                  borderRadius: 10,
+                  width: 280,
+                  height: 280,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "#f6c94822",
+                  color: "#222",
+                  fontWeight: 700,
+                  fontSize: 64,
+                  letterSpacing: 2,
+                }}
+              >
+                {(entrenador.nombre?.charAt(0) || "") + (entrenador.apellido?.charAt(0) || "")}
+              </div>
+            )}
           </div>
           {/* Información principal del entrenador */}
           <div className="perfil-main">

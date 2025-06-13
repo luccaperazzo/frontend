@@ -241,28 +241,49 @@ const BusquedaEntrenadores = () => {
           {!loading && entrenadores.length === 0 && (
             <div className="busqueda-vacio">No hay entrenadores para los filtros seleccionados.</div>
           )}
-          {/* Cards de entrenadores */}
-          <div className="busqueda-cards">
+          {/* Cards de entrenadores */}          <div className="busqueda-cards">
             {paginatedEntrenadores.map((e, idx) => (
               <div className="trainer-card" key={e._id || idx}>
-                {/* Imagen circular del entrenador */}
-                <img
-                  src={
-                    e.avatarUrl
-                      ? (e.avatarUrl.startsWith("http") ? e.avatarUrl : `http://localhost:3001${e.avatarUrl}`)
-                      : "/foto-por-defecto.png"
-                  }
-                  alt={e.nombre}
-                  className="trainer-avatar"
-                  style={{
-                    width: 90,
-                    height: 90,
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                    margin: "0 auto 12px auto",
-                    display: "block"
-                  }}
-                />
+                {/* Imagen circular del entrenador o iniciales */}
+                {e.avatarUrl ? (
+                  <img
+                    src={
+                      e.avatarUrl.startsWith("http") 
+                        ? e.avatarUrl 
+                        : `http://localhost:3001${e.avatarUrl}`
+                    }
+                    alt={`${e.nombre} ${e.apellido}`}
+                    className="trainer-avatar"
+                    style={{
+                      width: 90,
+                      height: 90,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      margin: "0 auto 12px auto",
+                      display: "block"
+                    }}
+                  />
+                ) : (
+                  <div
+                    className="trainer-avatar"
+                    style={{
+                      width: 90,
+                      height: 90,
+                      borderRadius: "50%",
+                      margin: "0 auto 12px auto",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "#f6c94822",
+                      color: "#222",
+                      fontWeight: 700,
+                      fontSize: 28,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    {(e.nombre?.charAt(0) || "") + (e.apellido?.charAt(0) || "")}
+                  </div>
+                )}
                 {/* Nombre y apellido */}
                 <div className="trainer-name" style={{ fontWeight: 700, fontSize: "1.2rem", marginBottom: 2 }}>
                   {e.nombre} {e.apellido}
