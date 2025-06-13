@@ -70,34 +70,8 @@ const LandingPage = () => {
             onClick={() => navigate('/register')}
           >
             Conviérte en Entrenador
-          </button>
-        )}
+          </button>        )}
         </div>
-        {/* Botón para poblar la base de datos en desarrollo */}
-        {process.env.NODE_ENV !== 'production' && (
-          <button
-            style={{
-              background: '#007bff',
-              border: 'none',
-              padding: '10px 20px',
-              color: 'white',
-              fontSize: 16,
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              borderRadius: '5px',
-              marginTop: 10,
-              marginLeft: 10
-            }}
-            onClick={async () => {
-              const res = await fetch('http://localhost:3001/api/dev/seed', { method: 'POST' });
-              const data = await res.json();
-              alert(data.message || 'Operación realizada');
-              window.location.reload();
-            }}
-          >
-            Poblar Base de Datos (DEV)
-          </button>
-        )}
         {/* Imagen ilustrativa */}
         <div className="landing-image-container">
           <img
@@ -174,10 +148,51 @@ const LandingPage = () => {
               <div className="trainer-idiomas">
                 {Array.isArray(t.idiomas) ? t.idiomas.join(" / ") : t.idiomas}
               </div>
-            </div>
-          ))}
+            </div>          ))}
         </div>
-      </section>
+      </section>      {/* Easter Egg: Botón discreto de desarrollo */}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          width: '24px',
+          height: '24px',
+          cursor: 'pointer',
+          opacity: 0.4,
+          transition: 'all 0.4s ease',
+          zIndex: 1000,
+          fontSize: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          userSelect: 'none'
+        }}        onMouseEnter={(e) => {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'scale(1.3)';
+          e.target.innerHTML = '🌿';
+          e.target.title = '🌱 Dev Garden - Click to seed database';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.opacity = '0.4';
+          e.target.style.transform = 'scale(1)';
+          e.target.innerHTML = '🌱';
+        }}
+        onClick={async () => {
+          if (window.confirm('🌱 ¿Plantar datos de prueba en la base de datos?')) {
+            try {
+              const res = await fetch('http://localhost:3001/api/dev/seed', { method: 'POST' });
+              const data = await res.json();
+              alert('🌿 ' + (data.message || 'Jardín plantado exitosamente'));
+              window.location.reload();
+            } catch (err) {
+              alert('🥀 Error al plantar: ' + err.message);
+            }
+          }
+        }}
+      >
+        🌱
+      </div>
     </Layout>
   );
 };
