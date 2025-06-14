@@ -51,9 +51,17 @@ export default function MiEspacioEntrenador() {
   const [userData, setUserData] = useState(null)
   const [loadingUser, setLoadingUser] = useState(true)
 
-  // Cantidad de entrenadores por página (paginación)
-  const PAGE_SIZE = 4;
-  const [currentPage, setCurrentPage] = useState(1);
+  // Cantidad de Servicios por página (paginación)
+  const PAGE_SIZE_SERVICIO = 4;
+  const [currentPageServicio, setCurrentPageServicio] = useState(1);
+
+  // Cantidad de sesiones por página (paginación)
+  const PAGE_SIZE_SESIONES = 6;
+  const [currentPageSesiones, setCurrentPageSesiones] = useState(1);
+
+  // Cantidad de clientes-documentos por página
+  const PAGE_SIZE_DOCUMENTOS = 4;
+  const [currentPageDocumentos, setCurrentPageDocumentos] = useState(1);
 
   // — Cargar reservas al montar —
   useEffect(() => {
@@ -119,13 +127,38 @@ export default function MiEspacioEntrenador() {
     setClientesConReservas(clientesArray)
   }
 
-    // — Cálculo de paginado de servicios —
-    const totalPages = Math.ceil(servicios.length / PAGE_SIZE);
-    // Array de servicios a mostrar en la página actual
-    const paginatedServicios = servicios.slice(
-      (currentPage - 1) * PAGE_SIZE,
-      currentPage * PAGE_SIZE
-    );
+  // — Cálculo de paginado de servicios —
+  const totalPages = Math.ceil(servicios.length / PAGE_SIZE_SERVICIO);
+  // Array de servicios a mostrar en la página actual
+  const paginatedServicios = servicios.slice(
+    (currentPageServicio - 1) * PAGE_SIZE_SERVICIO,
+    currentPageServicio * PAGE_SIZE_SERVICIO
+  );
+
+  // — Cálculo de paginado de Documentos —
+  const totalPagesDocumentos = Math.ceil(clientesConReservas.length / PAGE_SIZE_DOCUMENTOS);
+  const paginatedClientesConReservas = clientesConReservas.slice(
+    (currentPageDocumentos - 1) * PAGE_SIZE_DOCUMENTOS,
+    currentPageDocumentos * PAGE_SIZE_DOCUMENTOS
+  );
+
+  // — Cálculo de paginado de sesiones —
+  const totalPagesSesiones = Math.ceil(reservas.length / PAGE_SIZE_SESIONES);
+  // Array de sesiones a mostrar en la página actual
+  const paginatedReservas = reservas.slice(
+    (currentPageSesiones - 1) * PAGE_SIZE_SESIONES,
+    currentPageSesiones * PAGE_SIZE_SESIONES
+  );
+
+  // Cuando se actualizan las reservas, volvemos a la primera página por si cambia la cantidad
+  useEffect(() => {
+    setCurrentPageSesiones(1);
+  }, [reservas]);
+
+  // Cuando se actualizan las reservas, volvemos a la primera página de los documentos por si cambia la cantidad
+  useEffect(() => {
+    setCurrentPageDocumentos(1);
+  }, [clientesConReservas]);
 
   // — Cargar servicios del entrenador —
   const cargarServicios = async () => {
@@ -370,14 +403,36 @@ export default function MiEspacioEntrenador() {
                       <p>No tienes sesiones programadas</p>
                     </div>
                   ) : (
-                    reservas.map((reserva) => (
-                      <SessionCard
-                        key={reserva._id || reserva.id}
-                        reserva={reserva}
-                        onAction={handleReservaAction}
-                        onReprogramar={handleReprogramar}
-                      />
-                    ))
+                    <>
+                      {paginatedReservas.map((reserva) => (
+                        <SessionCard
+                          key={reserva._id || reserva.id}
+                          reserva={reserva}
+                          onAction={handleReservaAction}
+                          onReprogramar={handleReprogramar}
+                        />
+                      ))}
+                      {/* Paginado de sesiones: solo si hay más de una página */}
+                      {totalPagesSesiones > 1 && (
+                        <div className="pagination-controls" style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "center", marginTop: 24 }}>
+                          <button
+                            disabled={currentPageSesiones === 1}
+                            onClick={() => setCurrentPageSesiones(currentPageSesiones - 1)}
+                          >
+                            Anterior
+                          </button>
+                          <span>
+                            Página {currentPageSesiones} de {totalPagesSesiones}
+                          </span>
+                          <button
+                            disabled={currentPageSesiones === totalPagesSesiones}
+                            onClick={() => setCurrentPageSesiones(currentPageSesiones + 1)}
+                          >
+                            Siguiente
+                          </button>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               )}
@@ -398,14 +453,44 @@ export default function MiEspacioEntrenador() {
                       <p>No tienes clientes con reservas activas para compartir documentos</p>
                     </div>
                   ) : (
-                    clientesConReservas.map((clienteData) => (
-                      <ClientDocumentCard
-                        key={clienteData.cliente._id || clienteData.cliente.id}
-                        cliente={clienteData.cliente}
-                        reservas={clienteData.reservas}
-                        onDocumentUploaded={handleDocumentUploaded}
-                      />
-                    ))
+                    <>
+                      {paginatedClientesConReservas.map((clienteData) => (
+                        <ClientDocumentCard
+                          key={clienteData.cliente._id || clienteData.cliente.id}
+                          cliente={clienteData.cliente}
+                          reservas={clienteData.reservas}
+                          onDocumentUploaded={handleDocumentUploaded}
+                        />
+                      ))}
+                      {totalPagesDocumentos > 1 && (
+                        <div
+                          className="pagination-controls"
+                          style={{
+                            display: "flex",
+                            gap: 8,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginTop: 24,
+                          }}
+                        >
+                          <button
+                            disabled={currentPageDocumentos === 1}
+                            onClick={() => setCurrentPageDocumentos(currentPageDocumentos - 1)}
+                          >
+                            Anterior
+                          </button>
+                          <span>
+                            Página {currentPageDocumentos} de {totalPagesDocumentos}
+                          </span>
+                          <button
+                            disabled={currentPageDocumentos === totalPagesDocumentos}
+                            onClick={() => setCurrentPageDocumentos(currentPageDocumentos + 1)}
+                          >
+                            Siguiente
+                          </button>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               )}
@@ -450,17 +535,17 @@ export default function MiEspacioEntrenador() {
                   {totalPages > 1 && (
                     <div className="pagination-controls" style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "center", marginTop: 16 }}>
                       <button
-                        disabled={currentPage === 1}
-                        onClick={() => setCurrentPage(currentPage - 1)}
+                        disabled={currentPageServicio === 1}
+                        onClick={() => setCurrentPageServicio(currentPageServicio - 1)}
                       >
                         Anterior
                       </button>
                       <span>
-                        Página {currentPage} de {totalPages}
+                        Página {currentPageServicio} de {totalPages}
                       </span>
                       <button
-                        disabled={currentPage === totalPages}
-                        onClick={() => setCurrentPage(currentPage + 1)}
+                        disabled={currentPageServicio === totalPages}
+                        onClick={() => setCurrentPageServicio(currentPageServicio + 1)}
                       >
                         Siguiente
                       </button>
