@@ -47,7 +47,7 @@ const SessionCard = ({ reserva, onAction, onReprogramar }) => {
     switch (state?.toLowerCase()) {
       case "aceptado":
       case "confirmed":
-        return { color: "#28a745", text: "Aceptado" }
+        return { color: "#28a745", text: "Confirmado" }
       case "pendiente":
       case "pending":
         return { color: "#ffc107", text: "Pendiente" }

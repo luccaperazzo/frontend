@@ -233,3 +233,37 @@
     font-size: 0.9rem;
   }
 }
+
+
+.filtros-sesiones {
+  margin-bottom: 24px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.filtro-sesion-input,
+.filtro-sesion-select {
+  width: 180px;
+  font-size: 1rem;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.limpiar-btn {
+  margin-left: 16px;
+  height: 38px;
+  padding: 0 16px;
+  font-size: 1rem;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.limpiar-btn:hover {
+  background: #f8f9fa;
+}

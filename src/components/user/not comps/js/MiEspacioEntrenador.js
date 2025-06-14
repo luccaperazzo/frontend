@@ -52,7 +52,7 @@ export default function MiEspacioEntrenador() {
   const [loadingUser, setLoadingUser] = useState(true)
 
   // Cantidad de Servicios por página (paginación)
-  const PAGE_SIZE_SERVICIO = 4;
+  const PAGE_SIZE_SERVICIO = 6;
   const [currentPageServicio, setCurrentPageServicio] = useState(1);
 
   // Cantidad de sesiones por página (paginación)
@@ -62,6 +62,11 @@ export default function MiEspacioEntrenador() {
   // Cantidad de clientes-documentos por página
   const PAGE_SIZE_DOCUMENTOS = 4;
   const [currentPageDocumentos, setCurrentPageDocumentos] = useState(1);
+
+  // Filtros de sesiones (para entrenadores)
+  const [filtroCliente, setFiltroCliente] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState("");
+  const [filtroFecha, setFiltroFecha] = useState("");
 
   // — Cargar reservas al montar —
   useEffect(() => {
@@ -142,10 +147,30 @@ export default function MiEspacioEntrenador() {
     currentPageDocumentos * PAGE_SIZE_DOCUMENTOS
   );
 
+  // Filtrar sesiones según los filtros seleccionados
+  const reservasFiltradas = reservas.filter(reserva => {
+    const clienteNombre = (reserva.cliente?.nombre || "").toLowerCase();
+    const clienteApellido = (reserva.cliente?.apellido || "").toLowerCase();
+
+    const matchCliente =
+      !filtroCliente ||
+      clienteNombre.includes(filtroCliente.toLowerCase()) ||
+      clienteApellido.includes(filtroCliente.toLowerCase());
+
+    const matchEstado =
+      !filtroEstado || (reserva.estado && reserva.estado.toLowerCase() === filtroEstado.toLowerCase());
+
+    const matchFecha =
+      !filtroFecha ||
+      (reserva.fechaInicio && reserva.fechaInicio.slice(0, 10) === filtroFecha);
+
+    return matchCliente && matchEstado && matchFecha;
+  });
+
   // — Cálculo de paginado de sesiones —
-  const totalPagesSesiones = Math.ceil(reservas.length / PAGE_SIZE_SESIONES);
+  const totalPagesSesiones = Math.ceil(reservasFiltradas.length / PAGE_SIZE_SESIONES);
   // Array de sesiones a mostrar en la página actual
-  const paginatedReservas = reservas.slice(
+  const paginatedReservas = reservasFiltradas.slice(
     (currentPageSesiones - 1) * PAGE_SIZE_SESIONES,
     currentPageSesiones * PAGE_SIZE_SESIONES
   );
@@ -394,6 +419,51 @@ export default function MiEspacioEntrenador() {
               <h2 className="section-title">Mis sesiones</h2>
               <p className="section-subtitle">Organiza las sesiones con tus clientes</p>
 
+              {/* --- Filtros de Sesiones --- */}
+              <div className="filtros-sesiones">
+                <div>
+                  <label>Cliente<br />
+                    <input
+                      type="text"
+                      value={filtroCliente}
+                      onChange={e => setFiltroCliente(e.target.value)}
+                      placeholder="Buscar por nombre"
+                      className="filtro-sesion-input"
+                    />
+                  </label>
+                </div>
+                <div>
+                  <label>Estado<br />
+                    <select
+                      value={filtroEstado}
+                      onChange={e => setFiltroEstado(e.target.value)}
+                      className="filtro-sesion-input"
+                    >
+                      <option value="">Todos</option>
+                      <option value="Pendiente">Pendiente</option>
+                      <option value="Aceptado">Confirmado</option>
+                      <option value="Cancelado">Cancelado</option>
+                      <option value="Finalizado">Finalizado</option>
+                    </select>
+                  </label>
+                </div>
+                <div>
+                  <label>Fecha<br />
+                    <input
+                      type="date"
+                      value={filtroFecha}
+                      onChange={e => setFiltroFecha(e.target.value)}
+                      className="filtro-sesion-input"
+                    />
+                  </label>
+                </div>
+                <button
+                  className="limpiar-btn"
+                  onClick={() => { setFiltroCliente(""); setFiltroEstado(""); setFiltroFecha(""); }}
+                >
+                  Limpiar
+                </button>
+              </div>
               {loadingReservas ? (
                 <div className="loading-state">Cargando sesiones...</div>
               ) : (

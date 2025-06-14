@@ -46,6 +46,11 @@ export default function MiEspacioCliente() {
   const PAGE_SIZE_ENTRENADORES = 6;
   const [currentPageEntrenadores, setCurrentPageEntrenadores] = useState(1);
 
+  // Filtros de sesiones
+  const [filtroEntrenador, setFiltroEntrenador] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState("");
+  const [filtroFecha, setFiltroFecha] = useState("");
+
   // — Cargar reservas al montar —
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -149,9 +154,29 @@ export default function MiEspacioCliente() {
     setTimeout(() => setShowReviewConfirm(false), 2500)
   }
 
+  // Filtrar sesiones según los filtros seleccionados
+const reservasFiltradas = reservas.filter(reserva => {
+  const entrenadorNombre = (reserva.servicio?.entrenador?.nombre || reserva.entrenador?.nombre || "").toLowerCase();
+  const entrenadorApellido = (reserva.servicio?.entrenador?.apellido || reserva.entrenador?.apellido || "").toLowerCase();
+
+  const matchEntrenador =
+    !filtroEntrenador ||
+    entrenadorNombre.includes(filtroEntrenador.toLowerCase()) ||
+    entrenadorApellido.includes(filtroEntrenador.toLowerCase());
+
+  const matchEstado =
+    !filtroEstado || (reserva.estado && reserva.estado.toLowerCase() === filtroEstado.toLowerCase());
+
+  const matchFecha =
+    !filtroFecha ||
+    (reserva.fechaInicio && reserva.fechaInicio.slice(0, 10) === filtroFecha);
+
+  return matchEntrenador && matchEstado && matchFecha;
+});
+
   // Paginado Sesiones
-  const totalPagesSesiones = Math.ceil(reservas.length / PAGE_SIZE_SESIONES);
-  const paginatedReservas = reservas.slice(
+  const totalPagesSesiones = Math.ceil(reservasFiltradas.length / PAGE_SIZE_SESIONES);
+  const paginatedReservas = reservasFiltradas.slice(
     (currentPageSesiones - 1) * PAGE_SIZE_SESIONES,
     currentPageSesiones * PAGE_SIZE_SESIONES
   );
@@ -239,6 +264,52 @@ export default function MiEspacioCliente() {
             <div className="sesiones-content">
               <h2 className="section-title">Mis sesiones</h2>
               <p className="section-subtitle">Revisa y gestiona tus sesiones programadas</p>
+
+              {/* --- Filtros de Sesiones --- */}
+              <div className="filtros-sesiones">
+                <div>
+                  <label>Entrenador<br />
+                    <input
+                      type="text"
+                      value={filtroEntrenador}
+                      onChange={e => setFiltroEntrenador(e.target.value)}
+                      placeholder="Buscar por nombre"
+                      className="filtro-sesion-input"
+                    />
+                  </label>
+                </div>
+                <div>
+                  <label>Estado<br />
+                    <select
+                      value={filtroEstado}
+                      onChange={e => setFiltroEstado(e.target.value)}
+                      className="filtro-sesion-input"
+                    >
+                      <option value="">Todos</option>
+                      <option value="Pendiente">Pendiente</option>
+                      <option value="Aceptado">Confirmado</option>
+                      <option value="Cancelado">Cancelado</option>
+                      <option value="Finalizado">Finalizado</option>
+                    </select>
+                  </label>
+                </div>
+                <div>
+                  <label>Fecha<br />
+                    <input
+                      type="date"
+                      value={filtroFecha}
+                      onChange={e => setFiltroFecha(e.target.value)}
+                      className="filtro-sesion-input"
+                    />
+                  </label>
+                </div>
+                <button
+                  className="limpiar-btn"
+                  onClick={() => { setFiltroEntrenador(""); setFiltroEstado(""); setFiltroFecha(""); }}
+                >
+                  Limpiar
+                </button>
+              </div>
 
               {loadingReservas ? (
                 <div className="loading-state">Cargando sesiones...</div>
