@@ -20,10 +20,10 @@ const TrainerCard = ({ trainer, onReview }) => {
         <div className="trainer-details">
           <h3 className="trainer-name">
             {trainer.nombre} {trainer.apellido}
-          </h3>
-          <div className="trainer-rating">
+          </h3>          <div className="trainer-rating">
             <span className="rating-stars">★</span>
             <span className="rating-value">{formatRating(trainer.avgRating)}</span>
+            <span className="rating-count">({trainer.totalRatings || 0} reseñas)</span>
           </div>
         </div>
       </div>

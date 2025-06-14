@@ -66,6 +66,12 @@
   color: #495057;
 }
 
+.rating-count {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 400;
+}
+
 .trainer-card-actions {
   display: flex;
   gap: 12px;

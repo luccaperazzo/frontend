@@ -70,7 +70,8 @@ const LandingPage = () => {
             onClick={() => navigate('/register')}
           >
             Conviérte en Entrenador
-          </button>        )}
+          </button>
+        )}
         </div>
         {/* Imagen ilustrativa */}
         <div className="landing-image-container">
