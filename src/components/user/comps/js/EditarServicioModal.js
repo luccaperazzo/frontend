@@ -219,22 +219,23 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
           </div>
 
           <div className="form-group">
-            <label htmlFor="precio">Precio</label>
-            <div className="price-input-container">
-              <span className="currency-symbol">$</span>
-              <input
-                type="number"
-                id="precio"
-                name="precio"
-                value={formData.precio}
-                onChange={handleInputChange}
-                placeholder="0"
-                min="0"
-                step="0.01"
-                className="form-input price-input"
-              />
-            </div>
-          </div>
+  <label htmlFor="precio">Precio</label>
+  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <span style={{ fontSize: 18, color: '#6c757d', minWidth: 18 }}>$</span>
+    <input
+      type="number"
+      id="precio"
+      name="precio"
+      value={formData.precio}
+      onChange={handleInputChange}
+      placeholder="0"
+      min="0"
+      step="0.01"
+      className="form-input"
+      style={{ flex: 1 }}
+    />
+  </div>
+</div>
 
           <div className="form-group">
             <label htmlFor="duracion">Duración</label>

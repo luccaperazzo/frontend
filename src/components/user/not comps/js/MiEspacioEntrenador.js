@@ -51,6 +51,10 @@ export default function MiEspacioEntrenador() {
   const [userData, setUserData] = useState(null)
   const [loadingUser, setLoadingUser] = useState(true)
 
+  // Cantidad de entrenadores por página (paginación)
+  const PAGE_SIZE = 4;
+  const [currentPage, setCurrentPage] = useState(1);
+
   // — Cargar reservas al montar —
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -114,6 +118,14 @@ export default function MiEspacioEntrenador() {
     const clientesArray = Array.from(clientesMap.values())
     setClientesConReservas(clientesArray)
   }
+
+    // — Cálculo de paginado de servicios —
+    const totalPages = Math.ceil(servicios.length / PAGE_SIZE);
+    // Array de servicios a mostrar en la página actual
+    const paginatedServicios = servicios.slice(
+      (currentPage - 1) * PAGE_SIZE,
+      currentPage * PAGE_SIZE
+    );
 
   // — Cargar servicios del entrenador —
   const cargarServicios = async () => {
@@ -424,7 +436,7 @@ export default function MiEspacioEntrenador() {
                       </button>
                     </div>
                   ) : (
-                    servicios.map((servicio) => (
+                    paginatedServicios.map((servicio) => (
                       <ServiceCard
                         key={servicio._id}
                         servicio={servicio}
@@ -433,6 +445,26 @@ export default function MiEspacioEntrenador() {
                         onTogglePublish={handleTogglePublishService}
                       />
                     ))
+                  )}
+                  {/* Paginado de servicios: solo si hay más de una página */}
+                  {totalPages > 1 && (
+                    <div className="pagination-controls" style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "center", marginTop: 16 }}>
+                      <button
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                      >
+                        Anterior
+                      </button>
+                      <span>
+                        Página {currentPage} de {totalPages}
+                      </span>
+                      <button
+                        disabled={currentPage === totalPages}
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                      >
+                        Siguiente
+                      </button>
+                    </div>
                   )}
                 </div>
               )}
