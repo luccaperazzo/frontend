@@ -34,6 +34,18 @@ export default function MiEspacioCliente() {
   // — Estado para documentos —
   const [clientesConReservas, setClientesConReservas] = useState([])
 
+  // Cantidad de sesiones por página (paginación)
+  const PAGE_SIZE_SESIONES = 6;
+  const [currentPageSesiones, setCurrentPageSesiones] = useState(1);
+
+  // Cantidad de clientes-documentos por página
+  const PAGE_SIZE_DOCUMENTOS = 4;
+  const [currentPageDocumentos, setCurrentPageDocumentos] = useState(1);
+
+  // Cantidad de entrenadores por página (paginación)
+  const PAGE_SIZE_ENTRENADORES = 6;
+  const [currentPageEntrenadores, setCurrentPageEntrenadores] = useState(1);
+
   // — Cargar reservas al montar —
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -137,6 +149,42 @@ export default function MiEspacioCliente() {
     setTimeout(() => setShowReviewConfirm(false), 2500)
   }
 
+  // Paginado Sesiones
+  const totalPagesSesiones = Math.ceil(reservas.length / PAGE_SIZE_SESIONES);
+  const paginatedReservas = reservas.slice(
+    (currentPageSesiones - 1) * PAGE_SIZE_SESIONES,
+    currentPageSesiones * PAGE_SIZE_SESIONES
+  );
+
+  // Paginado Documentos
+  const totalPagesDocumentos = Math.ceil(clientesConReservas.length / PAGE_SIZE_DOCUMENTOS);
+  const paginatedClientesConReservas = clientesConReservas.slice(
+    (currentPageDocumentos - 1) * PAGE_SIZE_DOCUMENTOS,
+    currentPageDocumentos * PAGE_SIZE_DOCUMENTOS
+  );
+
+  // — Paginado entrenadores —
+  const totalPagesEntrenadores = Math.ceil(misEntrenadores.length / PAGE_SIZE_ENTRENADORES);
+  const paginatedEntrenadores = misEntrenadores.slice(
+  (currentPageEntrenadores - 1) * PAGE_SIZE_ENTRENADORES,
+  currentPageEntrenadores * PAGE_SIZE_ENTRENADORES
+);
+
+  // Cuando se actualizan las reservas, volvemos a la primera página por si cambia la cantidad
+  useEffect(() => {
+    setCurrentPageSesiones(1);
+  }, [reservas]);
+
+  // Cuando se actualizan las reservas, volvemos a la primera página de los documentos por si cambia la cantidad
+  useEffect(() => {
+    setCurrentPageDocumentos(1);
+  }, [clientesConReservas]);
+
+  // Cuando se actualizan los entrenadores, volvemos a la primera página por si cambia la cantidad
+  useEffect(() => {
+    setCurrentPageEntrenadores(1);
+  }, [misEntrenadores]);
+
   // — Función para manejar documento subido —
   const handleDocumentUploaded = () => {
     // Recargar reservas para actualizar documentos
@@ -201,9 +249,30 @@ export default function MiEspacioCliente() {
                       <p>No tienes sesiones programadas</p>
                     </div>
                   ) : (
-                    reservas.map((reserva) => (
-                      <ClientSessionCard key={reserva._id} reserva={reserva} onCancel={handleCancelReserva} />
-                    ))
+                    <>
+                      {paginatedReservas.map((reserva) => (
+                        <ClientSessionCard key={reserva._id} reserva={reserva} onCancel={handleCancelReserva} />
+                      ))}
+                      {totalPagesSesiones > 1 && (
+                        <div className="pagination-controls" style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "center", marginTop: 24 }}>
+                          <button
+                            disabled={currentPageSesiones === 1}
+                            onClick={() => setCurrentPageSesiones(currentPageSesiones - 1)}
+                          >
+                            Anterior
+                          </button>
+                          <span>
+                            Página {currentPageSesiones} de {totalPagesSesiones}
+                          </span>
+                          <button
+                            disabled={currentPageSesiones === totalPagesSesiones}
+                            onClick={() => setCurrentPageSesiones(currentPageSesiones + 1)}
+                          >
+                            Siguiente
+                          </button>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               )}
@@ -224,7 +293,7 @@ export default function MiEspacioCliente() {
                       <p>Aún no tienes documentos compartidos por tus entrenadores</p>
                     </div>
                   ) : (
-                    clientesConReservas.map((trainerData) => (
+                    paginatedClientesConReservas.map((trainerData) => (
                       <div
                         key={trainerData.entrenador._id || trainerData.entrenador}
                         className="trainer-documents-section"
@@ -297,7 +366,36 @@ export default function MiEspacioCliente() {
                         </div>
                       </div>
                     ))
-                  )}
+                  )
+                    }
+                      {totalPagesDocumentos > 1 && (
+                        <div
+                          className="pagination-controls"
+                          style={{
+                            display: "flex",
+                            gap: 8,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginTop: 24,
+                          }}
+                        >
+                          <button
+                            disabled={currentPageDocumentos === 1}
+                            onClick={() => setCurrentPageDocumentos(currentPageDocumentos - 1)}
+                          >
+                            Anterior
+                          </button>
+                          <span>
+                            Página {currentPageDocumentos} de {totalPagesDocumentos}
+                          </span>
+                          <button
+                            disabled={currentPageDocumentos === totalPagesDocumentos}
+                            onClick={() => setCurrentPageDocumentos(currentPageDocumentos + 1)}
+                          >
+                            Siguiente
+                          </button>
+                        </div>
+                      )}
                 </div>
               )}
             </div>
@@ -317,9 +415,30 @@ export default function MiEspacioCliente() {
                       <p>No tienes entrenadores con sesiones completadas</p>
                     </div>
                   ) : (
-                    misEntrenadores.map((trainer) => (
-                      <TrainerCard key={trainer._id} trainer={trainer} onReview={handleOpenReview} />
-                    ))
+                    <>
+                      {paginatedEntrenadores.map((trainer) => (
+                        <TrainerCard key={trainer._id} trainer={trainer} onReview={handleOpenReview} />
+                      ))}
+                      {totalPagesEntrenadores > 1 && (
+                        <div className="pagination-controls" style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "center", marginTop: 24 }}>
+                          <button
+                            disabled={currentPageEntrenadores === 1}
+                            onClick={() => setCurrentPageEntrenadores(currentPageEntrenadores - 1)}
+                          >
+                            Anterior
+                          </button>
+                          <span>
+                            Página {currentPageEntrenadores} de {totalPagesEntrenadores}
+                          </span>
+                          <button
+                            disabled={currentPageEntrenadores === totalPagesEntrenadores}
+                            onClick={() => setCurrentPageEntrenadores(currentPageEntrenadores + 1)}
+                          >
+                            Siguiente
+                          </button>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               )}
