@@ -33,9 +33,6 @@ export default function MiEspacioCliente() {
 
   // — Estado para documentos —
   const [clientesConReservas, setClientesConReservas] = useState([])
-  
-  // — Estado para manejar errores de imagen de entrenadores en documentos —
-  const [trainerImageErrors, setTrainerImageErrors] = useState(new Set())
 
   // Cantidad de sesiones por página (paginación)
   const PAGE_SIZE_SESIONES = 6;
@@ -97,8 +94,6 @@ export default function MiEspacioCliente() {
 
     const trainersArray = Array.from(trainerDocuments.values())
     setClientesConReservas(trainersArray)
-    // Resetear errores de imagen cuando se actualizan los datos
-    setTrainerImageErrors(new Set())
   }
 
   // — Cargar entrenadores cuando se activa esa pestaña —
@@ -159,29 +154,6 @@ export default function MiEspacioCliente() {
     setReviewTrainer(null) // Limpia el trainer seleccionado
     setShowReviewConfirm(true) // Muestra el modal de confirmación
     setTimeout(() => setShowReviewConfirm(false), 2500) // Lo oculta después de 2.5 segundos
-  }
-
-  // — Función para manejar errores de imagen en documentos —
-  const handleTrainerImageError = (trainerId) => {
-    setTrainerImageErrors(prev => new Set([...prev, trainerId]))
-  }
-
-  // — Función para construir URL de imagen del entrenador —
-  const getTrainerImageUrl = (avatarUrl) => {
-    if (!avatarUrl) return null
-    
-    // Si ya contiene la URL completa, usarla tal como está
-    if (avatarUrl.startsWith('http')) {
-      return avatarUrl
-    }
-    
-    // Si empieza con /uploads, agregar la URL del servidor
-    if (avatarUrl.startsWith('/uploads')) {
-      return `http://localhost:3001${avatarUrl}`
-    }
-    
-    // Si no, asumir que es solo el nombre del archivo
-    return `http://localhost:3001/uploads/perfiles/${avatarUrl}`
   }
 
   // Filtrar sesiones según los filtros seleccionados
@@ -355,20 +327,19 @@ const reservasFiltradas = reservas.filter(reserva => {
                     <>
                       {paginatedReservas.map((reserva) => (
                         <ClientSessionCard key={reserva._id} reserva={reserva} onCancel={handleCancelReserva} />
-                      ))}                      {totalPagesSesiones > 1 && (
-                        <div className="pagination-controls">
+                      ))}
+                      {totalPagesSesiones > 1 && (
+                        <div className="pagination-controls" style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "center", marginTop: 24 }}>
                           <button
-                            className="pagination-btn prev"
                             disabled={currentPageSesiones === 1}
                             onClick={() => setCurrentPageSesiones(currentPageSesiones - 1)}
                           >
                             Anterior
                           </button>
-                          <span className="pagination-info">
+                          <span>
                             Página {currentPageSesiones} de {totalPagesSesiones}
                           </span>
                           <button
-                            className="pagination-btn next"
                             disabled={currentPageSesiones === totalPagesSesiones}
                             onClick={() => setCurrentPageSesiones(currentPageSesiones + 1)}
                           >
@@ -403,98 +374,136 @@ const reservasFiltradas = reservas.filter(reserva => {
                         className="trainer-documents-section"
                       >                        <div className="trainer-header">
                           <div className="trainer-avatar">
-                            {trainerData.entrenador.avatarUrl && !trainerImageErrors.has(trainerData.entrenador._id || trainerData.entrenador) ? (
-                              <img
-                                src={getTrainerImageUrl(trainerData.entrenador.avatarUrl)}
+                            {trainerData.entrenador.avatarUrl ? (
+                              <img 
+                                src={
+                                  trainerData.entrenador.avatarUrl.startsWith('http')
+                                    ? trainerData.entrenador.avatarUrl
+                                    : `http://localhost:3001${trainerData.entrenador.avatarUrl}`
+                                }
                                 alt={`${trainerData.entrenador.nombre} ${trainerData.entrenador.apellido}`}
                                 className="trainer-avatar-img"
-                                onError={() => handleTrainerImageError(trainerData.entrenador._id || trainerData.entrenador)}
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }}
                               />
-                            ) : (
-                              <div className="trainer-initials">
-                                {`${trainerData.entrenador.nombre?.charAt(0) || ""}${trainerData.entrenador.apellido?.charAt(0) || ""}`.toUpperCase()}
-                              </div>
-                            )}
+                            ) : null}
+                            <span 
+                              className="trainer-initials"
+                              style={{ display: trainerData.entrenador.avatarUrl ? 'none' : 'flex' }}
+                            >
+                              {`${trainerData.entrenador.nombre?.charAt(0) || ""}${trainerData.entrenador.apellido?.charAt(0) || ""}`.toUpperCase()}
+                            </span>
                           </div>
                           <div className="trainer-info">
                             <h3>
                               {trainerData.entrenador.nombre} {trainerData.entrenador.apellido}
-                            </h3>
-                            <p>
-                              {trainerData.reservas.length} documento{trainerData.reservas.length !== 1 ? "s" : ""}{" "}
-                              compartido{trainerData.reservas.length !== 1 ? "s" : ""}
+                            </h3>                            <p>
+                              {trainerData.reservas.reduce((total, reserva) => total + reserva.documentos.length, 0)} documento{trainerData.reservas.reduce((total, reserva) => total + reserva.documentos.length, 0) !== 1 ? 's' : ''}{" "}
+                              compartido{trainerData.reservas.reduce((total, reserva) => total + reserva.documentos.length, 0) !== 1 ? 's' : ''} • {trainerData.reservas.length} sesión{trainerData.reservas.length !== 1 ? 'es' : ''}
                             </p>
                           </div>
-                        </div>
-
-                        {/* Aquí podríamos reutilizar ClientDocumentCard pero adaptado para cliente */}
-                        <div className="documents-grid">
-                          {trainerData.reservas.map((reserva) =>
-                            reserva.documentos.map((doc, index) => (
-                              <div key={`${reserva._id}-${index}`} className="document-item">
-                                <div className="document-icon">📄</div>
-                                <div className="document-info">
-                                  <h4 className="document-name">{doc.split("_").slice(2).join("_") || doc}</h4>
-                                  <p className="document-type">PDF</p>
-                                  <p className="document-service">{reserva.servicio?.titulo}</p>
-                                </div>
-                                <div className="document-actions">
-                                  <button
-                                    className="download-btn"
-                                    onClick={async () => {
-                                      try {
-                                        const token = localStorage.getItem("token")
-                                        const response = await fetch(
-                                          `http://localhost:3001/api/reserve/${reserva._id}/documents/${encodeURIComponent(doc)}`,
-                                          {
-                                            headers: { Authorization: `Bearer ${token}` },
-                                          },
-                                        )
-
-                                        if (response.ok) {
-                                          const blob = await response.blob()
-                                          const url = window.URL.createObjectURL(blob)
-                                          const a = document.createElement("a")
-                                          a.href = url
-                                          a.download = doc.split("_").slice(2).join("_") || doc
-                                          document.body.appendChild(a)
-                                          a.click()
-                                          document.body.removeChild(a)
-                                          window.URL.revokeObjectURL(url)
-                                        } else {
-                                          alert("Error al descargar el documento")
-                                        }
-                                      } catch (error) {
-                                        console.error("Error downloading document:", error)
-                                        alert("Error al descargar el documento")
-                                      }
-                                    }}
-                                    title="Descargar"
-                                  >
-                                    ⬇️
-                                  </button>
+                        </div>                        {/* Documentos agrupados por reserva */}
+                        <div className="reservations-list">
+                          {trainerData.reservas.map((reserva) => (
+                            <div key={reserva._id} className="reservation-documents-group">
+                              <div className="reservation-header">
+                                <div className="reservation-info">
+                                  <h4 className="reservation-service">{reserva.servicio?.titulo}</h4>                                  <p className="reservation-date">
+                                    📅 {new Date(reserva.fechaInicio).toLocaleDateString('es-AR', {
+                                      weekday: 'long',
+                                      year: 'numeric',
+                                      month: 'long',
+                                      day: 'numeric',
+                                      timeZone: 'UTC'
+                                    })} a las {new Date(reserva.fechaInicio).toLocaleTimeString('es-AR', {
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                      timeZone: 'UTC'
+                                    })} UTC
+                                  </p>
+                                  <span className="documents-count">
+                                    {reserva.documentos.length} documento{reserva.documentos.length !== 1 ? 's' : ''}
+                                  </span>
                                 </div>
                               </div>
-                            )),
-                          )}
+                              
+                              <div className="documents-grid">
+                                {reserva.documentos.map((doc, index) => (
+                                  <div key={`${reserva._id}-${index}`} className="document-item">
+                                    <div className="document-icon">📄</div>
+                                    <div className="document-info">
+                                      <h5 className="document-name">{doc.split("_").slice(2).join("_") || doc}</h5>
+                                      <p className="document-type">PDF</p>
+                                    </div>
+                                    <div className="document-actions">
+                                      <button
+                                        className="download-btn"
+                                        onClick={async () => {
+                                          try {
+                                            const token = localStorage.getItem("token")
+                                            const response = await fetch(
+                                              `http://localhost:3001/api/reserve/${reserva._id}/documents/${encodeURIComponent(doc)}`,
+                                              {
+                                                headers: { Authorization: `Bearer ${token}` },
+                                              },
+                                            )
+
+                                            if (response.ok) {
+                                              const blob = await response.blob()
+                                              const url = window.URL.createObjectURL(blob)
+                                              const a = document.createElement("a")
+                                              a.href = url
+                                              a.download = doc.split("_").slice(2).join("_") || doc
+                                              document.body.appendChild(a)
+                                              a.click()
+                                              document.body.removeChild(a)
+                                              window.URL.revokeObjectURL(url)
+                                            } else {
+                                              alert("Error al descargar el documento")
+                                            }
+                                          } catch (error) {
+                                            console.error("Error downloading document:", error)
+                                            alert("Error al descargar el documento")
+                                          }
+                                        }}
+                                        title="Descargar"
+                                      >
+                                        ⬇️
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     ))
                   )
-                    }                      {totalPagesDocumentos > 1 && (
-                        <div className="pagination-controls">
+                    }
+                      {totalPagesDocumentos > 1 && (
+                        <div
+                          className="pagination-controls"
+                          style={{
+                            display: "flex",
+                            gap: 8,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginTop: 24,
+                          }}
+                        >
                           <button
-                            className="pagination-btn prev"
                             disabled={currentPageDocumentos === 1}
                             onClick={() => setCurrentPageDocumentos(currentPageDocumentos - 1)}
                           >
                             Anterior
                           </button>
-                          <span className="pagination-info">
+                          <span>
                             Página {currentPageDocumentos} de {totalPagesDocumentos}
                           </span>
                           <button
-                            className="pagination-btn next"
                             disabled={currentPageDocumentos === totalPagesDocumentos}
                             onClick={() => setCurrentPageDocumentos(currentPageDocumentos + 1)}
                           >
@@ -524,20 +533,19 @@ const reservasFiltradas = reservas.filter(reserva => {
                     <>
                       {paginatedEntrenadores.map((trainer) => (
                         <TrainerCard key={trainer._id} trainer={trainer} onReview={handleOpenReview} />
-                      ))}                      {totalPagesEntrenadores > 1 && (
-                        <div className="pagination-controls">
+                      ))}
+                      {totalPagesEntrenadores > 1 && (
+                        <div className="pagination-controls" style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "center", marginTop: 24 }}>
                           <button
-                            className="pagination-btn prev"
                             disabled={currentPageEntrenadores === 1}
                             onClick={() => setCurrentPageEntrenadores(currentPageEntrenadores - 1)}
                           >
                             Anterior
                           </button>
-                          <span className="pagination-info">
+                          <span>
                             Página {currentPageEntrenadores} de {totalPagesEntrenadores}
                           </span>
                           <button
-                            className="pagination-btn next"
                             disabled={currentPageEntrenadores === totalPagesEntrenadores}
                             onClick={() => setCurrentPageEntrenadores(currentPageEntrenadores + 1)}
                           >

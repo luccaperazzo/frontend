@@ -63,7 +63,7 @@ const ClientSessionCard = ({ reserva, onCancel }) => {
     }
   }
 
-  const estadoInfo = getEstadoInfo(reserva.estado)
+  const estadoInfo = getEstadoInfo(reserva.estado) //Transforma los datos del back en info visual para mostrar
   const puedeCancelar = ["pendiente", "aceptado", "confirmed"].includes(reserva.estado?.toLowerCase())
 
   return (
