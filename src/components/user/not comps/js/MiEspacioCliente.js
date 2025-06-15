@@ -51,7 +51,7 @@ export default function MiEspacioCliente() {
   const [filtroEstado, setFiltroEstado] = useState("");
   const [filtroFecha, setFiltroFecha] = useState("");
 
-  // — Cargar reservas al montar —
+  // Devuelve las reservas del usuario
   useEffect(() => {
     const token = localStorage.getItem("token")
     fetch("http://localhost:3001/api/reserve", {
@@ -59,7 +59,7 @@ export default function MiEspacioCliente() {
     })
       .then((response) => response.json())
       .then((data) => {
-        setReservas(data)
+        setReservas(data) //guarda las reservas 
         setLoadingReservas(false)
         // Procesar documentos por entrenador
         processDocumentsByTrainer(data)
@@ -102,7 +102,7 @@ export default function MiEspacioCliente() {
 
     const token = localStorage.getItem("token")
     setLoadingEntrenadores(true)
-    fetch("http://localhost:3001/api/trainers", {
+    fetch("http://localhost:3001/api/trainers", { // Traer los trainers 
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => response.json())
@@ -111,6 +111,8 @@ export default function MiEspacioCliente() {
       .finally(() => setLoadingEntrenadores(false))
   }, [activeTab])
 
+
+  
   // — Función para cancelar reserva —
   const handleCancelReserva = async (reservaId) => {
     try {
