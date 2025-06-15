@@ -33,6 +33,9 @@ export default function MiEspacioCliente() {
 
   // — Estado para documentos —
   const [clientesConReservas, setClientesConReservas] = useState([])
+  
+  // — Estado para manejar errores de imagen de entrenadores en documentos —
+  const [trainerImageErrors, setTrainerImageErrors] = useState(new Set())
 
   // Cantidad de sesiones por página (paginación)
   const PAGE_SIZE_SESIONES = 6;
@@ -94,6 +97,8 @@ export default function MiEspacioCliente() {
 
     const trainersArray = Array.from(trainerDocuments.values())
     setClientesConReservas(trainersArray)
+    // Resetear errores de imagen cuando se actualizan los datos
+    setTrainerImageErrors(new Set())
   }
 
   // — Cargar entrenadores cuando se activa esa pestaña —
@@ -112,7 +117,7 @@ export default function MiEspacioCliente() {
   }, [activeTab])
 
 
-  
+
   // — Función para cancelar reserva —
   const handleCancelReserva = async (reservaId) => {
     try {
@@ -136,44 +141,69 @@ export default function MiEspacioCliente() {
     }
   }
 
-  // — Función para abrir modal de reseña —
+  // Abre el modal para escribir una reseña
   const handleOpenReview = (trainer) => {
-    setReviewTrainer(trainer)
-    setShowReview(true)
+    setReviewTrainer(trainer) // Guarda el trainer seleccionado en reviewTrainer
+    setShowReview(true) // Muestra el modal de reseña
   }
 
-  // — Función para cerrar modal de reseña —
+  //Se ejecuta cuando el cliente cancela/Cierra el modal
   const handleCloseReview = () => {
-    setShowReview(false)
-    setReviewTrainer(null)
+    setShowReview(false) //oculta el modal
+    setReviewTrainer(null) // Limpia el trainer seleccionado
   }
 
   // — Función para confirmar envío de reseña —
   const handleReviewSuccess = () => {
-    setShowReview(false)
-    setReviewTrainer(null)
-    setShowReviewConfirm(true)
-    setTimeout(() => setShowReviewConfirm(false), 2500)
+    setShowReview(false) // Oculta el modal de reseña
+    setReviewTrainer(null) // Limpia el trainer seleccionado
+    setShowReviewConfirm(true) // Muestra el modal de confirmación
+    setTimeout(() => setShowReviewConfirm(false), 2500) // Lo oculta después de 2.5 segundos
+  }
+
+  // — Función para manejar errores de imagen en documentos —
+  const handleTrainerImageError = (trainerId) => {
+    setTrainerImageErrors(prev => new Set([...prev, trainerId]))
+  }
+
+  // — Función para construir URL de imagen del entrenador —
+  const getTrainerImageUrl = (avatarUrl) => {
+    if (!avatarUrl) return null
+    
+    // Si ya contiene la URL completa, usarla tal como está
+    if (avatarUrl.startsWith('http')) {
+      return avatarUrl
+    }
+    
+    // Si empieza con /uploads, agregar la URL del servidor
+    if (avatarUrl.startsWith('/uploads')) {
+      return `http://localhost:3001${avatarUrl}`
+    }
+    
+    // Si no, asumir que es solo el nombre del archivo
+    return `http://localhost:3001/uploads/perfiles/${avatarUrl}`
   }
 
   // Filtrar sesiones según los filtros seleccionados
 const reservasFiltradas = reservas.filter(reserva => {
+  // Basicamente extraes el nombre y apellido del trainer
   const entrenadorNombre = (reserva.servicio?.entrenador?.nombre || reserva.entrenador?.nombre || "").toLowerCase();
   const entrenadorApellido = (reserva.servicio?.entrenador?.apellido || reserva.entrenador?.apellido || "").toLowerCase();
-
+  // Busca coincidencias en el nombre y apellido del entrenador en base al filtro
   const matchEntrenador =
-    !filtroEntrenador ||
+    !filtroEntrenador || // Si no hay filtro, muestra todas las reservas
     entrenadorNombre.includes(filtroEntrenador.toLowerCase()) ||
     entrenadorApellido.includes(filtroEntrenador.toLowerCase());
 
+  // Filtra por estado, si no hay filtro trae todas las reservas
   const matchEstado =
     !filtroEstado || (reserva.estado && reserva.estado.toLowerCase() === filtroEstado.toLowerCase());
-
+  // Filtra por fecha, si no hay filtro trae todas las reservas
   const matchFecha =
     !filtroFecha ||
     (reserva.fechaInicio && reserva.fechaInicio.slice(0, 10) === filtroFecha);
 
-  return matchEntrenador && matchEstado && matchFecha;
+  return matchEntrenador && matchEstado && matchFecha; // Incluye reservas que cumplen con los filtros
 });
 
   // Paginado Sesiones
@@ -325,19 +355,20 @@ const reservasFiltradas = reservas.filter(reserva => {
                     <>
                       {paginatedReservas.map((reserva) => (
                         <ClientSessionCard key={reserva._id} reserva={reserva} onCancel={handleCancelReserva} />
-                      ))}
-                      {totalPagesSesiones > 1 && (
-                        <div className="pagination-controls" style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "center", marginTop: 24 }}>
+                      ))}                      {totalPagesSesiones > 1 && (
+                        <div className="pagination-controls">
                           <button
+                            className="pagination-btn prev"
                             disabled={currentPageSesiones === 1}
                             onClick={() => setCurrentPageSesiones(currentPageSesiones - 1)}
                           >
                             Anterior
                           </button>
-                          <span>
+                          <span className="pagination-info">
                             Página {currentPageSesiones} de {totalPagesSesiones}
                           </span>
                           <button
+                            className="pagination-btn next"
                             disabled={currentPageSesiones === totalPagesSesiones}
                             onClick={() => setCurrentPageSesiones(currentPageSesiones + 1)}
                           >
@@ -370,10 +401,20 @@ const reservasFiltradas = reservas.filter(reserva => {
                       <div
                         key={trainerData.entrenador._id || trainerData.entrenador}
                         className="trainer-documents-section"
-                      >
-                        <div className="trainer-header">
+                      >                        <div className="trainer-header">
                           <div className="trainer-avatar">
-                            {`${trainerData.entrenador.nombre?.charAt(0) || ""}${trainerData.entrenador.apellido?.charAt(0) || ""}`.toUpperCase()}
+                            {trainerData.entrenador.avatarUrl && !trainerImageErrors.has(trainerData.entrenador._id || trainerData.entrenador) ? (
+                              <img
+                                src={getTrainerImageUrl(trainerData.entrenador.avatarUrl)}
+                                alt={`${trainerData.entrenador.nombre} ${trainerData.entrenador.apellido}`}
+                                className="trainer-avatar-img"
+                                onError={() => handleTrainerImageError(trainerData.entrenador._id || trainerData.entrenador)}
+                              />
+                            ) : (
+                              <div className="trainer-initials">
+                                {`${trainerData.entrenador.nombre?.charAt(0) || ""}${trainerData.entrenador.apellido?.charAt(0) || ""}`.toUpperCase()}
+                              </div>
+                            )}
                           </div>
                           <div className="trainer-info">
                             <h3>
@@ -440,28 +481,20 @@ const reservasFiltradas = reservas.filter(reserva => {
                       </div>
                     ))
                   )
-                    }
-                      {totalPagesDocumentos > 1 && (
-                        <div
-                          className="pagination-controls"
-                          style={{
-                            display: "flex",
-                            gap: 8,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            marginTop: 24,
-                          }}
-                        >
+                    }                      {totalPagesDocumentos > 1 && (
+                        <div className="pagination-controls">
                           <button
+                            className="pagination-btn prev"
                             disabled={currentPageDocumentos === 1}
                             onClick={() => setCurrentPageDocumentos(currentPageDocumentos - 1)}
                           >
                             Anterior
                           </button>
-                          <span>
+                          <span className="pagination-info">
                             Página {currentPageDocumentos} de {totalPagesDocumentos}
                           </span>
                           <button
+                            className="pagination-btn next"
                             disabled={currentPageDocumentos === totalPagesDocumentos}
                             onClick={() => setCurrentPageDocumentos(currentPageDocumentos + 1)}
                           >
@@ -491,19 +524,20 @@ const reservasFiltradas = reservas.filter(reserva => {
                     <>
                       {paginatedEntrenadores.map((trainer) => (
                         <TrainerCard key={trainer._id} trainer={trainer} onReview={handleOpenReview} />
-                      ))}
-                      {totalPagesEntrenadores > 1 && (
-                        <div className="pagination-controls" style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "center", marginTop: 24 }}>
+                      ))}                      {totalPagesEntrenadores > 1 && (
+                        <div className="pagination-controls">
                           <button
+                            className="pagination-btn prev"
                             disabled={currentPageEntrenadores === 1}
                             onClick={() => setCurrentPageEntrenadores(currentPageEntrenadores - 1)}
                           >
                             Anterior
                           </button>
-                          <span>
+                          <span className="pagination-info">
                             Página {currentPageEntrenadores} de {totalPagesEntrenadores}
                           </span>
                           <button
+                            className="pagination-btn next"
                             disabled={currentPageEntrenadores === totalPagesEntrenadores}
                             onClick={() => setCurrentPageEntrenadores(currentPageEntrenadores + 1)}
                           >
