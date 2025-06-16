@@ -7,7 +7,7 @@ const BARRIOS_CABA = [
   "Almagro", "Balvanera", "Barracas", "Belgrano", "Boedo",
   "Caballito", "Chacarita", "Coghlan", "Colegiales", "Constitución",
   "Flores", "Floresta", "La Boca", "La Paternal", "Liniers", "Mataderos",
-  "Monserrat", "Monte Castro", "Nueva Pompeya", "Nuñez", "Palermo",
+  "Monserrat", "Monte Castro", "Nueva Pompeya", "Núñez", "Palermo",
   "Parque Avellaneda", "Parque Chacabuco", "Parque Chas", "Parque Patricios",
   "Puerto Madero", "Recoleta", "Retiro", "Saavedra", "San Cristóbal",
   "San Nicolás", "San Telmo", "Vélez Sarsfield", "Versalles", "Villa Crespo",
@@ -53,13 +53,39 @@ const CrearCuenta = () => {
   const [error, setError] = useState("");
   // Estado para mostrar mensaje de éxito
   const [success, setSuccess] = useState("");
-
   /**
    * handleChange
    * Actualiza el estado formData cuando cambia un campo del formulario.
+   * Incluye validaciones en tiempo real para longitud de campos.
    */
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // Validaciones en tiempo real para longitud
+    if (name === 'nombre' && value.length > 50) {
+      setError("El nombre no puede superar los 50 caracteres");
+      return;
+    }
+    
+    if (name === 'apellido' && value.length > 50) {
+      setError("El apellido no puede superar los 50 caracteres");
+      return;
+    }
+    
+    if (name === 'email' && value.length > 100) {
+      setError("El email no puede superar los 100 caracteres");
+      return;
+    }
+    
+    if (name === 'presentacion' && value.length > 500) {
+      setError("La presentación no puede superar los 500 caracteres");
+      return;
+    }
+    
+    // Limpiar error si el campo ahora es válido
+    setError("");
+    
+    setFormData({ ...formData, [name]: value });
   };
 
   /**
@@ -91,13 +117,21 @@ const CrearCuenta = () => {
       role: trainer ? "entrenador" : "cliente" // <-- actualizar role según selección
     });
   };
-
   // Actualizar preview cuando seleccionás una imagen
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
+    
+    // Validar tamaño de archivo (máximo 5MB)
+    if (file && file.size > 5 * 1024 * 1024) {
+      setError("La imagen debe ser menor a 5MB");
+      e.target.value = ""; // Limpiar el input
+      return;
+    }
+    
     setAvatar(file);
     if (file) {
       setAvatarPreview(URL.createObjectURL(file));
+      setError(""); // Limpiar error si había
     } else {
       setAvatarPreview(null);
     }
@@ -107,11 +141,32 @@ const CrearCuenta = () => {
    * handleSubmit
    * Envía el formulario al backend para registrar el usuario.
    * Muestra mensajes de error o éxito según la respuesta.
-   */
-  const handleSubmit = async (e) => {
+   */  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+
+    // Validaciones frontend
+    if (formData.nombre.length > 50) {
+      setError("El nombre no puede superar los 50 caracteres");
+      return;
+    }
+    
+    if (formData.apellido.length > 50) {
+      setError("El apellido no puede superar los 50 caracteres");
+      return;
+    }
+    
+    if (formData.email.length > 100) {
+      setError("El email no puede superar los 100 caracteres");
+      return;
+    }
+    
+    if (isTrainer && formData.presentacion.length > 500) {
+      setError("La presentación no puede superar los 500 caracteres");
+      return;
+    }
+
     try {
       const formDataToSend = new FormData();
       Object.keys(formData).forEach(key => {
@@ -182,35 +237,35 @@ const CrearCuenta = () => {
           </div>
           {/* Campos comunes para ambos roles */}
           <div className="register-group">
-            <label>Nombre</label>
-            <input
+            <label>Nombre</label>            <input
               className="register-input"
               type="text"
               name="nombre"
               value={formData.nombre}
               onChange={handleChange}
+              maxLength={50}
               required //Esto hace que lo tengas que completar sí o sí
             />
           </div>
           <div className="register-group">
-            <label>Apellido</label>
-            <input
+            <label>Apellido</label>            <input
               className="register-input"
               type="text"
               name="apellido"
               value={formData.apellido}
               onChange={handleChange}
+              maxLength={50}
               required
             />
           </div>
           <div className="register-group">
-            <label>Email</label>
-            <input
+            <label>Email</label>            <input
               className="register-input"
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
+              maxLength={100}
               required
             />
           </div>
@@ -286,13 +341,13 @@ const CrearCuenta = () => {
                 </div>
               </div>
               <div className="register-group">
-                <label>Presentación</label>
-                <input
+                <label>Presentación</label>                <input
                   className="register-input"
                   type="text"
                   name="presentacion"
                   value={formData.presentacion}
                   onChange={handleChange}
+                  maxLength={500}
                   required
                   placeholder="Soy entrenador personal certificado..."
                 />

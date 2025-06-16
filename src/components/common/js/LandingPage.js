@@ -151,12 +151,13 @@ const LandingPage = () => {
               </div>
             </div>          ))}
         </div>
-      </section>      {/* Easter Egg: Botón discreto de desarrollo */}
+      </section>      {/* Easter Eggs: Botones discretos de desarrollo */}
+      {/* Botón de Poblar Datos */}
       <div
         style={{
           position: 'fixed',
           bottom: '20px',
-          right: '20px',
+          right: '60px',
           width: '24px',
           height: '24px',
           cursor: 'pointer',
@@ -168,7 +169,8 @@ const LandingPage = () => {
           alignItems: 'center',
           justifyContent: 'center',
           userSelect: 'none'
-        }}        onMouseEnter={(e) => {
+        }}
+        onMouseEnter={(e) => {
           e.target.style.opacity = '1';
           e.target.style.transform = 'scale(1.3)';
           e.target.innerHTML = '🌿';
@@ -193,6 +195,53 @@ const LandingPage = () => {
         }}
       >
         🌱
+      </div>
+
+      {/* Botón de Limpiar Base de Datos */}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          width: '24px',
+          height: '24px',
+          cursor: 'pointer',
+          opacity: 0.4,
+          transition: 'all 0.4s ease',
+          zIndex: 1000,
+          fontSize: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          userSelect: 'none'
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'scale(1.3)';
+          e.target.innerHTML = '🔥';
+          e.target.title = '🗑️ Dev Cleaner - Click to clear database';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.opacity = '0.4';
+          e.target.style.transform = 'scale(1)';
+          e.target.innerHTML = '🗑️';
+        }}
+        onClick={async () => {
+          if (window.confirm('🗑️ ¿ELIMINAR TODOS LOS DATOS de la base de datos?\n\n⚠️ Esta acción NO se puede deshacer')) {
+            if (window.confirm('🚨 ¿Estás COMPLETAMENTE SEGURO?\n\nEsto borrará:\n- Todos los usuarios\n- Todos los entrenadores\n- Todos los servicios\n- Todas las reservas\n- Todos los ratings')) {
+              try {
+                const res = await fetch('http://localhost:3001/api/dev/clear', { method: 'DELETE' });
+                const data = await res.json();
+                alert('🧹 ' + (data.message || 'Base de datos limpiada exitosamente'));
+                window.location.reload();
+              } catch (err) {
+                alert('💥 Error al limpiar: ' + err.message);
+              }
+            }
+          }
+        }}
+      >
+        🗑️
       </div>
     </Layout>
   );

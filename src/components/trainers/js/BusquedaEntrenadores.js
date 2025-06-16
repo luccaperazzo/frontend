@@ -11,7 +11,7 @@ const zonas = [
   "Almagro", "Balvanera", "Barracas", "Belgrano", "Boedo",
   "Caballito", "Chacarita", "Coghlan", "Colegiales", "Constitución",
   "Flores", "Floresta", "La Boca", "La Paternal", "Liniers", "Mataderos",
-  "Monserrat", "Monte Castro", "Nueva Pompeya", "Nuñez", "Palermo",
+  "Monserrat", "Monte Castro", "Nueva Pompeya", "Núñez", "Palermo",
   "Parque Avellaneda", "Parque Chacabuco", "Parque Chas", "Parque Patricios",
   "Puerto Madero", "Recoleta", "Retiro", "Saavedra", "San Cristóbal",
   "San Nicolás", "San Telmo", "Vélez Sarsfield", "Versalles", "Villa Crespo",
@@ -63,7 +63,6 @@ const BusquedaEntrenadores = () => {
 
   // Hook de navegación de React Router
   const navigate = useNavigate();
-
   /**
    * Construye el query string para la API a partir de los filtros seleccionados.
    * Devuelve una cadena como "?categoria=Entrenamiento&zona=Palermo&..."
@@ -84,9 +83,17 @@ const BusquedaEntrenadores = () => {
         params.push(`${key}=${encodeURIComponent(value)}`);
       }
     }
-    return params.length ? "?" + params.join("&") : "";
+    
+    const queryString = params.length ? "?" + params.join("&") : "";
+    
+    // 🔧 LOG: Query string construida
+    console.log('🔧 CONSTRUYENDO QUERY:');
+    console.log('  Filtros actuales:', filtros);
+    console.log('  Parámetros válidos:', params);
+    console.log('  Query string final:', queryString);
+    
+    return queryString;
   };
-
   /**
    * useEffect: Llama a la API para buscar entrenadores cada vez que cambian los filtros.
    * Actualiza el estado de entrenadores y loading.
@@ -94,12 +101,108 @@ const BusquedaEntrenadores = () => {
   useEffect(() => {
     const fetchEntrenadores = async () => {
       setLoading(true);
-      const res = await fetch("http://localhost:3001/api/service/trainers" + buildQuery(), {
+      
+      // 🎯 LOG: Filtros aplicados
+      console.log('🎯 FILTROS APLICADOS:', filtros);
+      
+      const query = buildQuery();
+      const url = "http://localhost:3001/api/service/trainers" + query;
+      
+      // 🌐 LOG: URL completa
+      console.log('🌐 URL LLAMADA:', url);
+      
+      const res = await fetch(url, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       const data = await res.json();
+      
+      // 📊 LOG: Respuesta completa del servidor
+      console.log('📊 RESPUESTA DEL SERVIDOR:', data);
+      
+      // 🔍 LOG: Verificación de filtros en los resultados
+      if (data.entrenadores && data.entrenadores.length > 0) {
+        console.log('🔍 VERIFICANDO FILTROS EN RESULTADOS:');
+        
+        data.entrenadores.forEach((entrenador, index) => {
+          console.log(`\n--- ENTRENADOR ${index + 1}: ${entrenador.nombre} ${entrenador.apellido} ---`);
+          console.log('📍 Zona del entrenador:', entrenador.zona);
+          console.log('🗣️ Idiomas del entrenador:', entrenador.idiomas);
+          console.log('⭐ Rating del entrenador:', entrenador.avgRating);
+            // Verificar servicios si existen
+          if (entrenador.servicios && entrenador.servicios.length > 0) {
+            console.log('🛠️ SERVICIOS QUE CUMPLEN LOS FILTROS:');
+            console.log(`  📝 NOTA: Solo se muestran servicios que YA pasaron el filtrado del backend`);
+            entrenador.servicios.forEach((servicio, sIndex) => {
+              console.log(`  Servicio ${sIndex + 1}: ${servicio.titulo}`);
+              console.log(`    📂 Categoría: ${servicio.categoria}`);
+              console.log(`    💰 Precio: $${servicio.precio}`);
+              console.log(`    ⏱️ Duración: ${servicio.duracion} min`);
+              console.log(`    🏠 Modalidad: ${servicio.presencial ? 'Presencial' : 'Virtual'}`);
+              
+              // Verificar si cumple filtros aplicados (doble verificación)
+              const cumpleFiltros = [];
+              if (filtros.categoria && servicio.categoria !== filtros.categoria) {
+                cumpleFiltros.push(`❌ Categoría no coincide (esperado: ${filtros.categoria}, actual: ${servicio.categoria})`);
+              }
+              if (filtros.precioMax && servicio.precio > parseInt(filtros.precioMax)) {
+                cumpleFiltros.push(`❌ Precio excede máximo (esperado: ≤${filtros.precioMax}, actual: ${servicio.precio})`);
+              }
+              if (filtros.duracion && servicio.duracion !== parseInt(filtros.duracion)) {
+                cumpleFiltros.push(`❌ Duración no coincide (esperado: ${filtros.duracion}, actual: ${servicio.duracion})`);
+              }
+              if (filtros.presencial === 'presencial' && !servicio.presencial) {
+                cumpleFiltros.push(`❌ Modalidad no coincide (esperado: Presencial, actual: Virtual)`);
+              }
+              if (filtros.presencial === 'virtual' && servicio.presencial) {
+                cumpleFiltros.push(`❌ Modalidad no coincide (esperado: Virtual, actual: Presencial)`);
+              }
+              
+              if (cumpleFiltros.length === 0) {
+                console.log(`    ✅ CORRECTO: Cumple todos los filtros (como debería)`);
+              } else {
+                console.log(`    🚨 ERROR DEL BACKEND: No debería estar aquí con estos problemas:`);
+                cumpleFiltros.forEach(problema => console.log(`      ${problema}`));
+              }
+            });
+          } else {
+            console.log('✅ CORRECTO: Sin servicios que cumplan los filtros aplicados');
+            console.log('  📝 EXPLICACIÓN: El backend filtró correctamente');
+            console.log('  📝 El entrenador aparece porque cumple filtros básicos (zona, idioma, rating)');
+            console.log('  📝 Pero ninguno de sus servicios cumple los filtros de servicio aplicados');
+          }
+          
+          // Verificar filtros del entrenador
+          const problemasEntrenador = [];
+          if (filtros.zona && entrenador.zona !== filtros.zona) {
+            problemasEntrenador.push(`❌ Zona no coincide (esperado: ${filtros.zona}, actual: ${entrenador.zona})`);
+          }
+          if (filtros.rating && entrenador.avgRating < parseInt(filtros.rating)) {
+            problemasEntrenador.push(`❌ Rating insuficiente (esperado: ≥${filtros.rating}, actual: ${entrenador.avgRating})`);
+          }
+          if (filtros.idioma && filtros.idioma.length > 0) {
+            const tieneIdiomas = filtros.idioma.some(idioma => entrenador.idiomas?.includes(idioma));
+            if (!tieneIdiomas) {
+              problemasEntrenador.push(`❌ No habla idiomas requeridos (esperado: ${filtros.idioma.join(', ')}, actual: ${entrenador.idiomas?.join(', ')})`);
+            }
+          }
+          
+          if (problemasEntrenador.length === 0) {
+            console.log('✅ ENTRENADOR CUMPLE FILTROS BÁSICOS');
+          } else {
+            console.log('⚠️ PROBLEMAS CON FILTROS DEL ENTRENADOR:');
+            problemasEntrenador.forEach(problema => console.log(`  ${problema}`));
+          }
+        });
+      } else {
+        console.log('❌ NO SE ENCONTRARON ENTRENADORES');
+        console.log('🤔 Posibles razones:');
+        console.log('  - Los filtros son muy restrictivos');
+        console.log('  - No hay datos en la base');
+        console.log('  - Problema con el backend');
+      }
+      
       setEntrenadores(data.entrenadores || []);
       setLoading(false);
     };
