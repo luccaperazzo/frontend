@@ -70,6 +70,129 @@
   font-size: 0.98rem;
 }
 
+/* Estilos para reseñas */
+.resena-container {
+  border: 1.3px solid #f2f2f2;
+  border-radius: 11px;
+  margin-bottom: 18px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  background: #fff;
+}
+
+.resena-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #f2f2f2;
+  color: #888;
+  font-weight: 700;
+  font-size: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.resena-content {
+  flex: 1;
+  min-width: 0; /* Permite que el texto se corte correctamente */
+}
+
+.resena-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+}
+
+.resena-nombre {
+  font-weight: 600;
+}
+
+.resena-tiempo {
+  color: #888;
+  font-size: 13px;
+  margin-left: 6px;
+}
+
+.resena-texto {
+  margin: 7px 0;
+  color: #222;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.resena-rating {
+  margin-left: 8px;
+  min-width: 86px;
+  flex-shrink: 0;
+}
+
+/* Media queries para móviles */
+@media (max-width: 768px) {
+  .resena-container {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .resena-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .resena-usuario-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .resena-texto {
+    margin: 8px 0 12px 0;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  
+  /* Ocultar rating desktop y mostrar rating móvil */
+  .resena-rating:last-child {
+    display: none !important;
+  }
+  
+  .resena-header .resena-rating {
+    display: block !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .resena-container {
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  
+  .resena-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 17px;
+  }
+  
+  .resena-texto {
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 10px 0;
+  }
+  
+  .resena-tiempo {
+    font-size: 12px;
+  }
+}
+
 @media (max-width: 800px) {
   .perfil-root {
     padding: 18px 2vw 25px 2vw;
