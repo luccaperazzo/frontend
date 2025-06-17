@@ -2,24 +2,24 @@ import Layout from "../../layout/js/Layout";
 
 const equipo = [
   {
-    nombre: "Juan Pérez",
+    nombre: "Santiago Morales",
     rol: "Fundador & CEO",
-    img: "https://randomuser.me/api/portraits/men/32.jpg"
+    img: "https://t3.ftcdn.net/jpg/07/39/19/12/360_F_739191208_rmVDRJ4fcAhdcKS23gv7wvWewB1n8lZZ.jpg"
   },
   {
-    nombre: "Lucía Gómez",
+    nombre: "Valentina Silva",
     rol: "Co-Fundadora & Marketing",
-    img: "https://randomuser.me/api/portraits/women/44.jpg"
+    img: "https://media.istockphoto.com/id/1398385367/photo/happy-millennial-business-woman-in-glasses-posing-with-hands-folded.jpg?s=612x612&w=0&k=20&c=Wd2vTDd6tJ5SeEY-aw0WL0bew8TAkyUGVvNQRj3oJFw="
   },
   {
-    nombre: "Matías Ruiz",
+    nombre: "Alejandro Torres",
     rol: "Desarrollo de Producto",
-    img: "https://randomuser.me/api/portraits/men/52.jpg"
+    img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face&auto=format"
   },
   {
-    nombre: "Carla Martínez",
+    nombre: "Sofía Hernández",
     rol: "Atención al Cliente",
-    img: "https://randomuser.me/api/portraits/women/61.jpg"
+    img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face&auto=format"
   },
 ];
 

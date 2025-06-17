@@ -272,14 +272,14 @@ const BusquedaEntrenadores = () => {
           {/* Filtro de categoría */}
           <label>Categoría</label>
           <select name="categoria" value={filtros.categoria} onChange={handleChange}>
-            <option value="">Todas</option>
-            {categorias.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+            <option value="">Todas</option> {/* No tiene ningún valor*/}
+            {categorias.map(cat => <option key={cat} value={cat}>{cat}</option>)} {/* Se mapean las labels de categoria y se les asigna el valor correspondiente que es el mismo valor de su nombre */}
           </select>
 
           {/* Filtro de modalidad */}
           <label>Modalidad</label>
           <select name="presencial" value={filtros.presencial} onChange={handleChange}>
-            <option value="">Ambas</option>
+            <option value="">Ambas</option> {/* No tiene ningún valor */}
             <option value="presencial">Presencial</option>
             <option value="virtual">Virtual</option>
           </select>
@@ -292,22 +292,25 @@ const BusquedaEntrenadores = () => {
           <label>Duración (min)</label>
           <select name="duracion" value={filtros.duracion} onChange={handleChange}>
             <option value="">Cualquiera</option>
+            {/* Se mapean las duraciones y se les asigna el valor correspondiente que es el mismo a su nombre */}
             {duraciones.map(d => (
-              <option key={d} value={d}>{d}</option>
+              <option key={d} value={d}>{d}</option> 
             ))}
           </select>
 
           {/* Filtro de zona */}
           <label>Zona</label>
           <select name="zona" value={filtros.zona} onChange={handleChange}>
-            <option value="">Todas</option>
+            <option value="">Todas</option> {/* No tiene ningún valor */}
+              {/* Se mapean las zonas y se les asigna el valor correspondiente que es el mismo a su nombre */}
             {zonas.map(z => <option key={z} value={z}>{z}</option>)}
           </select>
 
           {/* Filtro de rating promedio */}
           <label>Promedio de rating</label>
           <select name="rating" value={filtros.rating || ""} onChange={handleChange}>
-            <option value="">Cualquiera</option>
+            <option value="">Cualquiera</option> {/* No tiene ningún valor */}
+            {/* Se mapean los ratings y se les asigna el valor correspondiente que es el mismo a su nombre */}
             {ratings.slice(0, -1).map(r => (
               <option key={r} value={String(r)}>{r}+</option>
             ))}
