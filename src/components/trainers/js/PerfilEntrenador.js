@@ -7,20 +7,38 @@ import { useNavigate } from "react-router-dom";
 /**
  * formateaTiempo
  * Formatea una fecha en string relativo (ej: "Hace 2 días").
+ * Maneja fechas en UTC para consistencia con el backend.
  * @param {string|Date} fecha - Fecha a formatear.
  * @returns {string} - Texto relativo al tiempo transcurrido.
  */
 function formateaTiempo(fecha) {
   if (!fecha) return "";
+  
+  // Crear objetos Date y trabajar directamente con getTime() para UTC
   const f = new Date(fecha);
   const ahora = new Date();
-  const dif = (ahora - f) / 1000;
+
+  console.log("Fecha de la reseña:", f, "Fecha actual:", ahora);
+
+  // getTime() ya devuelve milisegundos UTC desde epoch
+  const fechaUTC = f.getTime();
+  const ahoraUTC = ahora.getTime();
+  
+
+
+  console.log("Fecha de la reseña (ISO):", f.toISOString(), "Fecha actual (ISO):", ahora.toISOString()); //toISOString convierte la fecha a UTC
+  
+  const dif = (ahoraUTC - fechaUTC) / 1000;
+  
+  console.log("Diferencia en segundos:", dif);
+  
   if (dif < 60) return "Hace unos segundos";
-  if (dif < 3600) return `Hace ${Math.floor(dif / 60)} minutos`;
-  if (dif < 86400) return `Hace ${Math.floor(dif / 3600)} horas`;
-  if (dif < 2592000) return `Hace ${Math.floor(dif / 86400)} días`;
-  if (dif < 31536000) return `Hace ${Math.floor(dif / 2592000)} semanas`;
-  return `Hace ${Math.floor(dif / 31536000)} años`;
+  if (dif < 3600) return `Hace ${Math.floor(dif / 60)} minutos`; //X
+  if (dif < 86400) return `Hace ${Math.floor(dif / 3600)} horas`; // X
+  if (dif < 604800) return `Hace ${Math.floor(dif / 86400)} días`;// X
+  if (dif < 2592000) return `Hace ${Math.floor(dif / 604800)} semanas`; // X
+  if (dif < 31536000) return `Hace ${Math.floor(dif / 2592000)} meses`; //X
+  return `Hace ${Math.floor(dif / 31536000)} años`; //X
 }
 
 const PerfilEntrenador = () => {
@@ -64,7 +82,6 @@ const PerfilEntrenador = () => {
     };
     fetchEntrenador();
   }, [id]);
-
   /**
    * useEffect: Trae los servicios del entrenador al montar o cambiar el id.
    */
@@ -74,8 +91,12 @@ const PerfilEntrenador = () => {
       try {
         const res = await fetch(`http://localhost:3001/api/service/trainer/${id}`);
         const data = await res.json();
+        console.log('✅ Servicios data received:', data);
+        console.log('📋 Number of servicios:', data.servicios?.length || 0);
+        
         setServicios(data.servicios || []);
-      } catch {
+      } catch (error) {
+        console.error('❌ Error fetching servicios:', error);
         setServicios([]);
       } finally {
         setLoadingServicios(false);
@@ -331,50 +352,40 @@ const PerfilEntrenador = () => {
             ) : reseñas.length === 0 ? (
               <div style={{ margin: 30, color: "#888" }}>Aún no hay reseñas para este entrenador.</div>
             ) : (
-              <>
-                {(mostrarTodasReseñas ? reseñas : reseñas.slice(0, 3)).map(r => (
-                  <div key={r._id} style={{
-                    border: "1.3px solid #f2f2f2",
-                    borderRadius: 11,
-                    marginBottom: 18,
-                    padding: "14px 18px",
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: 15,
-                    background: "#fff"
-                  }}>
-                    {/* Avatar del cliente (letra o imagen) */}
-                    <div style={{
-                      width: 38,
-                      height: 38,
-                      borderRadius: "50%",
-                      background: "#f2f2f2",
-                      color: "#888",
-                      fontWeight: 700,
-                      fontSize: 19,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginRight: 6,
-                      flexShrink: 0
-                    }}>
+              <>                {(mostrarTodasReseñas ? reseñas : reseñas.slice(0, 3)).map(r => (
+                  <div key={r._id} className="resena-container">
+                    {/* Layout desktop: avatar + contenido + rating */}
+                    <div className="resena-avatar">
                       {r.cliente?.avatarUrl
                         ? <img src={r.cliente.avatarUrl} alt="" style={{ width: 38, height: 38, borderRadius: "50%" }} />
                         : (r.cliente?.nombre?.[0] || "U")}
                     </div>
-                    <div style={{ flex: 1 }}>
-                      {/* Nombre del cliente y fecha */}
-                      <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                        <span style={{ fontWeight: 600 }}>{r.cliente?.nombre} {r.cliente?.apellido}</span>
-                        <span style={{ color: "#888", fontSize: 13, marginLeft: 6 }}>
-                          {formateaTiempo(r.createdAt)}
-                        </span>
+                    
+                    <div className="resena-content">
+                      {/* Header con nombre, tiempo y rating (móvil) */}
+                      <div className="resena-header">
+                        <div className="resena-usuario-info">
+                          <span className="resena-nombre">{r.cliente?.nombre} {r.cliente?.apellido}</span>
+                          <span className="resena-tiempo">
+                            {formateaTiempo(r.createdAt)}
+                          </span>
+                        </div>
+                        {/* Rating visible solo en móvil */}
+                        <div className="resena-rating" style={{ display: 'none' }}>
+                          <span style={{ color: "#F6C948", fontSize: 20 }}>
+                            {Array.from({ length: 5 }).map((_, i) =>
+                              <span key={i}>{i < r.rating ? "★" : "☆"}</span>
+                            )}
+                          </span>
+                        </div>
                       </div>
+                      
                       {/* Texto de la reseña */}
-                      <div style={{ margin: "7px 0 7px 0", color: "#222" }}>{r.texto}</div>
+                      <div className="resena-texto">{r.texto}</div>
                     </div>
-                    {/* Estrellas de la reseña */}
-                    <div style={{ marginLeft: 8, minWidth: 86 }}>
+                    
+                    {/* Rating visible solo en desktop */}
+                    <div className="resena-rating">
                       <span style={{ color: "#F6C948", fontSize: 20 }}>
                         {Array.from({ length: 5 }).map((_, i) =>
                           <span key={i}>{i < r.rating ? "★" : "☆"}</span>
