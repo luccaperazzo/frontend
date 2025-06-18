@@ -21,8 +21,8 @@ export default function MiEspacioMetrics() {
   const [errorReviews, setErrorReviews] = useState("");
   const [replyingReview, setReplyingReview] = useState(null);
   const [replyText, setReplyText] = useState("");
-  const [replyLoading, setReplyLoading] = useState(false);
-  const [replyError, setReplyError] = useState("");
+  const [replyLoading, setReplyLoading] = useState(false);  const [replyError, setReplyError] = useState("");
+  const [trainerData, setTrainerData] = useState(null);
   let trainerId = localStorage.getItem("userId");
     if (!trainerId) {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -37,15 +37,22 @@ useEffect(() => {
     }
     setLoading(true);
     setError("");
-    axios
-      .get(`http://localhost:3001/api/trainers/${trainerId}/stats`, {
+    
+    // Fetch trainer data and metrics in parallel
+    Promise.all([
+      axios.get(`http://localhost:3001/api/trainers/${trainerId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      }),
+      axios.get(`http://localhost:3001/api/trainers/${trainerId}/stats`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       })
-      .then(res => {
+    ])
+      .then(([trainerRes, statsRes]) => {
+        setTrainerData(trainerRes.data);
         setMetrics({
-          promedio: res.data.avgRating,
-          total: res.data.totalRatings,
-          distribucion: res.data.ratingCounts
+          promedio: statsRes.data.avgRating,
+          total: statsRes.data.totalRatings,
+          distribucion: statsRes.data.ratingCounts
         });
       })
       .catch(() => setError("No se pudieron cargar las métricas."))
@@ -219,9 +226,8 @@ useEffect(() => {
                 {reviews.length === 0 ? (
                   <p style={{ color: "#888", marginTop: 24 }}>No hay comentarios aún.</p>
                 ) : (
-                  <div className="metrics-comments-list">
-                    {reviews
-                      .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+                  <div className="metrics-comments-list">                    {reviews
+                      .sort((a, b) => new Date(b.fecha || b.createdAt) - new Date(a.fecha || a.createdAt))
                       .map((r, i) => (
                         <div className="metrics-comment-card" key={i}>
                           <div className="metrics-comment-header">
@@ -233,10 +239,9 @@ useEffect(() => {
                             <div>
                               <div className="metrics-comment-name">
                                 {getUserName(r.cliente)}
-                              </div>
-                              <div className="metrics-comment-date">
-                                {r.fecha
-                                  ? dayjs(r.fecha).fromNow()
+                              </div>                              <div className="metrics-comment-date">
+                                {r.fecha || r.createdAt
+                                  ? dayjs(r.fecha || r.createdAt).utc().format('DD/MM/YYYY HH:mm')
                                   : ""}
                               </div>
                             </div>
@@ -260,8 +265,7 @@ useEffect(() => {
                                 alignItems: "flex-start",
                                 gap: 12
                               }}
-                            >
-                              <div
+                            >                              <div
                                 style={{
                                   width: 36,
                                   height: 36,
@@ -273,19 +277,40 @@ useEffect(() => {
                                   justifyContent: "center",
                                   fontWeight: 700,
                                   fontSize: 18,
-                                  flexShrink: 0
+                                  flexShrink: 0,
+                                  overflow: "hidden"
                                 }}
                                 title="Entrenador"
                               >
-                                🏋️
-                              </div>
-                              <div>
+                                {trainerData?.avatarUrl ? (
+                                  <img
+                                    src={
+                                      trainerData.avatarUrl.startsWith('http')
+                                        ? trainerData.avatarUrl
+                                        : `http://localhost:3001${trainerData.avatarUrl}`
+                                    }
+                                    alt="Entrenador"
+                                    style={{
+                                      width: "100%",
+                                      height: "100%",
+                                      objectFit: "cover",
+                                      borderRadius: "50%"
+                                    }}
+                                  />
+                                ) : (
+                                  <>🏋️</>
+                                )}
+                              </div><div>
                                 <div style={{ fontWeight: 600, color: "#1976d2", marginBottom: 2 }}>
                                   Tu respuesta
                                 </div>
-                                <div style={{ color: "#222", fontSize: 15, whiteSpace: "pre-line" }}>
+                                <div style={{ color: "#222", fontSize: 15, whiteSpace: "pre-line", marginBottom: 8 }}>
                                   {r.reply.texto}
-                                </div>
+                                </div>                                {r.reply.fecha || r.reply.createdAt ? (
+                                  <div style={{ fontSize: 11, color: "#666", marginTop: 4 }}>
+                                    Respondido el {dayjs(r.reply.fecha || r.reply.createdAt).utc().format('DD/MM/YYYY HH:mm')}
+                                  </div>
+                                ) : null}
                               </div>
                             </div>
                           )}
