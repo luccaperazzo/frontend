@@ -379,9 +379,62 @@ const PerfilEntrenador = () => {
                           </span>
                         </div>
                       </div>
-                      
-                      {/* Texto de la reseña */}
+                        {/* Texto de la reseña */}
                       <div className="resena-texto">{r.texto}</div>
+                      
+                      {/* Respuesta del entrenador */}
+                      {r.reply && (
+                        <div style={{
+                          marginTop: 12,
+                          padding: "12px 16px",
+                          background: "#f8f9fa",
+                          border: "1px solid #e9ecef",
+                          borderRadius: 8,
+                          borderLeft: "3px solid #28a745"
+                        }}>
+                          <div style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            marginBottom: 6
+                          }}>
+                            <div style={{
+                              width: 20,
+                              height: 20,
+                              background: "#28a745",
+                              borderRadius: "50%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "white",
+                              fontSize: 12,
+                              fontWeight: 600
+                            }}>
+                              E
+                            </div>
+                            <span style={{
+                              fontWeight: 600,
+                              fontSize: 14,
+                              color: "#495057"
+                            }}>
+                              Respuesta del entrenador
+                            </span>
+                            <span style={{
+                              fontSize: 12,
+                              color: "#6c757d"
+                            }}>
+                              {formateaTiempo(r.reply.createdAt)}
+                            </span>
+                          </div>
+                          <div style={{
+                            fontSize: 14,
+                            color: "#495057",
+                            lineHeight: 1.4
+                          }}>
+                            {r.reply.texto}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     
                     {/* Rating visible solo en desktop */}
