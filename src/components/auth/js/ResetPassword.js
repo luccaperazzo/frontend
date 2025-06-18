@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "../../layout/js/Layout";
 import "../css/ResetPassword.css"; // Podés usar el mismo CSS que Forgot, cambiando las clases
 
 const ResetPassword = () => {
+  const navigate = useNavigate();
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token'); //Se obtiene de la URL el TOKEN, para usarse como BODY para el POST
   const [password, setPassword] = useState("");
@@ -37,10 +39,14 @@ const ResetPassword = () => {
       if (!response.ok) {
         setError(data.error || data.message || "Token inválido o expirado.");
         return;
-      }
-      setSuccess("¡Contraseña actualizada! Ya podés iniciar sesión.");
+      }      setSuccess("¡Contraseña actualizada! Redirigiendo al login...");
       setPassword("");
       setConfirmPassword("");
+      
+      // Redireccionar al login después de 2 segundos
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     } catch {
       setError("Error de red o del servidor.");
     }
