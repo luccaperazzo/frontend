@@ -22,19 +22,39 @@ const DetalleServicio = () => {
   const [servicio, setServicio] = useState(null);
   const [loading, setLoading] = useState(true);
   const hasFetched = useRef(false); // Para evitar múltiples fetchs
-
   // Estados para el calendario y la selección de horarios
   const [fecha, setFecha] = useState(null); // Fecha seleccionada
   const [horarios, setHorarios] = useState([]); // Horarios disponibles para la fecha
   const [bloqueSeleccionado, setBloqueSeleccionado] = useState(""); // Horario elegido
   const [loadingHorarios, setLoadingHorarios] = useState(false); // Cargando horarios
   const [bookingLoading, setBookingLoading] = useState(false); // Cargando reserva/pago
-
   // NUEVO: Leer el usuario y rol desde localStorage
   const user = JSON.parse(localStorage.getItem("user") || "null");
-  const role = localStorage.getItem("role");
+  const role = localStorage.getItem("role");  // Calcular fecha mínima en UTC para el calendario
+  const getMinDateUTC = () => {
+    const nowUTC = new Date();
+    // Crear fecha en UTC para hoy
+    const todayUTC = new Date(Date.UTC(
+      nowUTC.getUTCFullYear(),
+      nowUTC.getUTCMonth(),
+      nowUTC.getUTCDate()
+    ));
+    
+    // IMPORTANTE: El DatePicker trabaja en hora local, 
+    // así que necesitamos ajustar para que muestre la fecha correcta
+    const minDate = new Date(
+      todayUTC.getUTCFullYear(),
+      todayUTC.getUTCMonth(),
+      todayUTC.getUTCDate()
+    );
+    
+    console.log(`Fecha mínima UTC: ${todayUTC.toISOString()}`);
+    console.log(`Fecha mínima para DatePicker: ${minDate.toISOString()}`);
+    
+    return minDate;
+  };
 
-  // Efecto para obtener los datos del servicio al montar el componente
+  // Básicamente estableces la variable de estado `servicio` con el servicio que obtuviste del backend.
   useEffect(() => {
     if (hasFetched.current) return;       // 🚩 si ya corrimos, salimos
     hasFetched.current = true;            // marcamos que ya corrimos
@@ -45,22 +65,28 @@ const DetalleServicio = () => {
         const data = await res.json();
         setServicio(data);
       } catch {
-        setServicio(null);
+        setServicio(null); // Si hay error, setear servicio a null
       } finally {
-        setLoading(false);
+        setLoading(false); // Marcar que ya terminó de cargar
       }
     };
 
     fetchServicio();
-  }, [id]);
-
-  // Efecto para obtener los horarios disponibles cuando cambia la fecha
+  }, [id]);  // Cada vez que clickeas una fecha, se actualiza el estado de fecha y se limpian horarios.
   useEffect(() => {
     if (!fecha || !servicio) return;
     setLoadingHorarios(true);
     setBloqueSeleccionado(""); // reset al cambiar fecha
-    const fechaISO = fecha.toISOString().split("T")[0];
-    console.log(`Horario seleccionado: ${fechaISO}`); // Log para depuración
+    
+    // Convertir fecha a UTC para enviar al backend
+    const fechaUTC = new Date(Date.UTC(
+      fecha.getUTCFullYear(),
+      fecha.getUTCMonth(), 
+      fecha.getUTCDate()
+    ));
+    const fechaISO = fechaUTC.toISOString().split("T")[0];
+    console.log(`Fecha seleccionada (UTC): ${fechaISO}`); // Log para depuración
+    
     fetch(`http://localhost:3001/api/service/${servicio._id}/real-availability?fecha=${fechaISO}`)
       .then(res => res.json())
       .then(setHorarios)
@@ -74,23 +100,27 @@ const DetalleServicio = () => {
    */
   const handleReservaYStripe = async () => {
     if (!bloqueSeleccionado || !fecha) return;
-    setBookingLoading(true);
-
-    try {
+    setBookingLoading(true);    try {
       // Armá la fecha completa, fusionando fecha con la hora seleccionada (bloque) para formar la fecha que mandas al backend
       const [h, m] = bloqueSeleccionado.split(":");
       const fechaHoraUTC = new Date(Date.UTC(
-        fecha.getFullYear(),
-        fecha.getMonth(),
-        fecha.getDate(),
+        fecha.getUTCFullYear(),
+        fecha.getUTCMonth(),
+        fecha.getUTCDate(),
         Number(h),
         Number(m),
         0,
-        0
-      ));
-      console.log('fecha:', `${fecha}`, "bloqueSeleccionado:", `${bloqueSeleccionado}`);
-
-      console.log(`Fecha y hora enviada a la reserva (UTC): ${fechaHoraUTC.toISOString()}`); // Log para depuración
+        0      ));
+      
+      // 🚀 LOGS PARA VER QUÉ SE ENVÍA AL BACKEND
+      console.log('🎯 === DATOS DE RESERVA ===');
+      console.log('📅 Fecha seleccionada:', fecha);
+      console.log('⏰ Horario seleccionado:', bloqueSeleccionado);
+      console.log('🌍 Fecha y hora final enviada al backend (UTC):', fechaHoraUTC.toISOString());
+      console.log('📦 JSON que se envía:', JSON.stringify({
+        serviceId: servicio._id,
+        fechaInicio: fechaHoraUTC.toISOString()
+      }, null, 2));
 
       // Llamá al backend para crear la sesión de pago (pasando fechaInicio en metadata)
       const token = localStorage.getItem("token");
@@ -130,17 +160,19 @@ const DetalleServicio = () => {
   // Renderizado condicional según el estado de carga y existencia del servicio
   if (loading) return <Layout><div>Cargando servicio...</div></Layout>;
   if (!servicio) return <Layout><div>No se encontró el servicio.</div></Layout>;
+  // Detectar si estamos en móvil
+  const isMobile = window.innerWidth <= 768;
 
   // Render principal de la página
   return (
     <Layout>
       <div style={{
         maxWidth: 700,
-        margin: "40px auto",
+        margin: isMobile ? "20px auto" : "40px auto",
         background: "#fff",
         borderRadius: 15,
         boxShadow: "0 2px 10px #0001",
-        padding: 38
+        padding: isMobile ? 20 : 38
       }}>
         {/* Título y datos principales del servicio */}
         <h1 style={{ fontSize: "2.1rem", fontWeight: 700, marginBottom: 8 }}>{servicio.titulo}</h1>
@@ -164,19 +196,37 @@ const DetalleServicio = () => {
           paddingTop: 16
         }}>
           <b>Entrenador:</b> {servicio.entrenador?.nombre} {servicio.entrenador?.apellido}
-        </div>
-        {/* Calendario y bloques horarios */}
-        <div style={{ display: "flex", gap: 32, alignItems: "flex-start", marginTop: 35 }}>
+        </div>        {/* Calendario y bloques horarios */}
+        <div style={{ 
+          display: "flex", 
+          flexDirection: isMobile ? "column" : "row",
+          gap: isMobile ? 24 : 32, 
+          alignItems: "flex-start", 
+          marginTop: 35 
+        }}>
           {/* Calendario para seleccionar fecha */}
-          <div>
+          <div style={{ width: isMobile ? "100%" : "auto" }}>
             <b style={{ fontSize: 18 }}>Seleccione una fecha</b>
             <div style={{ marginTop: 8 }}>
               <DatePicker
                 selected={fecha}
                 onChange={date => {
-                  setFecha(date);
+                  // IMPORTANTE: Convertir la fecha seleccionada a UTC
+                  if (date) {
+                    // Crear fecha UTC usando los valores de la fecha local seleccionada
+                    const utcDate = new Date(Date.UTC(
+                      date.getFullYear(),
+                      date.getMonth(),
+                      date.getDate(),
+                      12, 0, 0 // Usar mediodía UTC para evitar problemas de zona horaria
+                    ));
+                    setFecha(utcDate);
+                    console.log(`Fecha seleccionada convertida a UTC: ${utcDate.toISOString()}`);
+                  } else {
+                    setFecha(null);
+                  }
                 }}
-                minDate={new Date()}
+                minDate={getMinDateUTC()} // Fecha mínima seleccionable en el calendario
                 dateFormat="dd/MM/yyyy"
                 inline
                 calendarStartDay={1}
@@ -186,7 +236,7 @@ const DetalleServicio = () => {
             </div>
           </div>
           {/* Horarios disponibles para la fecha seleccionada */}
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, width: isMobile ? "100%" : "auto" }}>
             <b style={{ fontSize: 19, marginBottom: 12, display: "block" }}>Horarios Disponibles</b>
             {/* Si es entrenador, mostrar mensaje y no mostrar horarios */}
             {role === "entrenador" ? (
@@ -197,17 +247,15 @@ const DetalleServicio = () => {
               <div style={{ color: "#999", margin: "20px 0" }}>Cargando horarios...</div>
             ) : horarios.length === 0 && fecha ? (
               <div style={{ color: "#999", margin: "20px 0" }}>No hay horarios disponibles para la fecha seleccionada.</div>
-            ) : (
-              <div style={{
+            ) : (              <div style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
+                gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
                 gap: 18
-              }}>
-                {horarios.map((h, i) => {
-                  // --- NUEVO BLOQUE: deshabilitar si ya pasó ---
+              }}>{horarios.map((h, i) => {
+                  // --- NUEVO BLOQUE: deshabilitar si ya pasó en UTC ---
                   let disabled = false;
                   if (fecha) {
-                    // Fecha seleccionada en UTC (año, mes, día)
+                    // Obtener fecha y hora actual en UTC
                     const nowUTC = new Date();
                     const isTodayUTC = // Se calcula si la fecha seleccionada es hoy en UTC
                       fecha.getUTCFullYear() === nowUTC.getUTCFullYear() &&
@@ -227,12 +275,11 @@ const DetalleServicio = () => {
                         0
                       ));
                       // Log para ver qué horas se están comparando
-                      console.log(
-                        `[Comparando horas] bloqueDateUTC: ${bloqueDateUTC.toISOString()}, nowUTC: ${nowUTC.toISOString()}`
-                      );
-                      if (bloqueDateUTC <= nowUTC) { //Si el horario ya paso, se marca como deshabilitado
+
+                      if (bloqueDateUTC <= nowUTC) { //Si el horario ya paso en UTC, se marca como deshabilitado
                         disabled = true;
                       }
+                      console.log(`Comparando bloque ${h} (${bloqueDateUTC.toISOString()}) con ahora (${nowUTC.toISOString()}) - Deshabilitado: ${disabled}`);
                     }
                   }
                   return (

@@ -22,8 +22,8 @@ const CrearServicioModal = ({ isOpen, onClose, onServiceCreated }) => {
   const duraciones = [
     { value: 30, label: "30 min" },
     { value: 45, label: "45 min" },
-    { value: 60, label: "1h" },
-    { value: 90, label: "1h 30m" },
+    { value: 60, label: "60 min" },
+    { value: 90, label: "90 min" },
   ]
 
   const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
