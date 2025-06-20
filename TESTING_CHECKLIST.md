@@ -81,25 +81,25 @@
 - [X] Eliminar documento funciona
 
 ### Métricas
-- [ ] Estadísticas generales se muestran
-- [ ] Métricas de servicios se cargan
-- [ ] Reseñas de clientes se muestran
-- [ ] Responder a reseñas funciona
+- [X] Estadísticas generales se muestran
+- [X] Métricas de servicios se cargan
+- [X] Reseñas de clientes se muestran
+- [X] Responder a reseñas funciona
 
 ## 👤 Funcionalidades de Cliente - ILAN
 
 ### Búsqueda de Entrenadores
-- [ ] Lista de entrenadores se carga
-- [ ] Filtros funcionan (categoría, zona, precio, etc.)
-- [ ] Paginación funciona
+- [X] Lista de entrenadores se carga
+- [X] Filtros funcionan (categoría, zona, precio, etc.)
+- [X] Paginación funciona
 - [ ] Avatares/iniciales se muestran correctamente
 
 ### Perfil de Entrenador
-- [ ] Información del entrenador se muestra correctamente
+- [X] Información del entrenador se muestra correctamente
 - [ ] Avatar/iniciales se muestran
-- [ ] Lista de servicios se carga
-- [ ] Tab de reseñas funciona
-- [ ] Navegación a detalle de servicio funciona
+- [X] Lista de servicios se carga
+- [X] Tab de reseñas funciona
+- [ ] Navegación a detalle de servicio funciona - Validar si el cambio de duracion es valido para los rangos de horario de las clases ya creadas.  
 
 ### Reservas y Pagos
 - [ ] Detalle de servicio se carga correctamente
