@@ -99,7 +99,7 @@
 - [ ] Avatar/iniciales se muestran
 - [X] Lista de servicios se carga
 - [X] Tab de reseñas funciona
-- [ ] Navegación a detalle de servicio funciona - Validar si el cambio de duracion es valido para los rangos de horario de las clases ya creadas.  
+- [X] Navegación a detalle de servicio funciona - 
 
 ### Reservas y Pagos
 - [ ] Detalle de servicio se carga correctamente
