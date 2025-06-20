@@ -22,8 +22,8 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
   const duraciones = [
     { value: 30, label: "30 min" },
     { value: 45, label: "45 min" },
-    { value: 60, label: "1h" },
-    { value: 90, label: "1h 30m" },
+    { value: 60, label: "60 min" },
+    { value: 90, label: "90 min" },
   ]
 
   // Cargar datos del servicio cuando se abre en modo edición
@@ -328,7 +328,7 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
   )
 }
 
-// Componente para configurar disponibilidad
+// Componente para configurar disponibilidad, parece que se hace de forma individual acá, donde se valida cada bloque cada vez que presionas el botón "Agregar"
 const DisponibilidadSelector = ({ disponibilidad, onChange, duracion }) => {
   const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 
