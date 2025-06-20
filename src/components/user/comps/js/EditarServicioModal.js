@@ -17,6 +17,8 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [showDisponibilidad, setShowDisponibilidad] = useState(false)
+  // Advertencia si la duración seleccionada no encaja en bloques existentes
+  const [duracionWarning, setDuracionWarning] = useState("")
 
   const categorias = ["Entrenamiento", "Nutrición", "Consultoría"]
   const duraciones = [
@@ -43,7 +45,7 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
         setShowDisponibilidad(true)
       }
     } else if (isOpen && !isEditing) {
-      // Resetear formulario para crear nuevo servicio
+      // Resetear formulario para crear nuevo servicio (aunque en este componente se suele usar isEditing=true)
       setFormData({
         titulo: "",
         categoria: "",
@@ -56,7 +58,45 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
       setShowDisponibilidad(false)
     }
     setError("")
+    setDuracionWarning("")
   }, [isOpen, isEditing, servicio])
+
+  // Validación inmediata de duración vs bloques existentes (opcional)
+  useEffect(() => {
+    if (isEditing && formData.disponibilidad && formData.duracion) {
+      const nuevaDur = Number.parseInt(formData.duracion, 10)
+      if (isNaN(nuevaDur) || nuevaDur <= 0) {
+        setDuracionWarning("Duración inválida")
+        return
+      }
+      // Recorremos bloques existentes
+      for (const [dia, bloques] of Object.entries(formData.disponibilidad)) {
+        for (const bloque of bloques) {
+          const [hInicio, mInicio] = bloque[0].split(":").map(Number)
+          const [hFin, mFin] = bloque[1].split(":").map(Number)
+          const minutosInicio = hInicio * 60 + mInicio
+          const minutosFin = hFin * 60 + mFin
+          const diff = minutosFin - minutosInicio
+          if (diff < nuevaDur) {
+            setDuracionWarning(
+              `La duración de ${nuevaDur} min supera la duración del bloque en ${dia} (${bloque[0]} - ${bloque[1]}).`
+            )
+            return
+          }
+          if (diff % nuevaDur !== 0) {
+            setDuracionWarning(
+              `La duración de ${nuevaDur} min no encaja exactamente en el bloque en ${dia} (${bloque[0]} - ${bloque[1]}).`
+            )
+            return
+          }
+        }
+      }
+      // Si todos encajan
+      setDuracionWarning("") 
+    } else {
+      setDuracionWarning("")
+    }
+  }, [formData.duracion, formData.disponibilidad, isEditing])
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -64,6 +104,7 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }))
+    // Nota: la validación de duración frente a bloques la hace el useEffect anterior
   }
 
   const handleDisponibilidadChange = (dia, bloques) => {
@@ -74,6 +115,7 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
         [dia]: bloques,
       },
     }))
+    // tras cambiar bloques, el useEffect revalidará la duración
   }
 
   const handleSubmit = async (e) => {
@@ -87,43 +129,73 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
       setLoading(false)
       return
     }
-
     if (!formData.categoria) {
       setError("Selecciona una categoría")
       setLoading(false)
       return
     }
-
     if (!formData.precio || formData.precio <= 0) {
       setError("El precio debe ser mayor a 0")
       setLoading(false)
       return
     }
-
     if (!formData.duracion) {
       setError("Selecciona una duración")
       setLoading(false)
       return
     }
-
     if (!formData.descripcion.trim()) {
       setError("La descripción es obligatoria")
       setLoading(false)
       return
     }
-
     if (Object.keys(formData.disponibilidad).length === 0) {
       setError("Debes configurar al menos un día de disponibilidad")
       setLoading(false)
       return
     }
 
+    // Validación extra: si estamos en edición y hay bloques existentes, 
+    // la nueva duración debe encajar en todos los bloques
+    if (isEditing && formData.disponibilidad && Object.keys(formData.disponibilidad).length > 0) {
+      const nuevaDur = Number.parseInt(formData.duracion, 10)
+      if (isNaN(nuevaDur) || nuevaDur <= 0) {
+        setError("Duración inválida")
+        setLoading(false)
+        return
+      }
+      for (const [dia, bloques] of Object.entries(formData.disponibilidad)) {
+        for (const bloque of bloques) {
+          const [h1, m1] = bloque[0].split(":").map(Number)
+          const [h2, m2] = bloque[1].split(":").map(Number)
+          const minutosInicio = h1 * 60 + m1
+          const minutosFin = h2 * 60 + m2
+          const diff = minutosFin - minutosInicio
+
+          if (diff < nuevaDur) {
+            setError(
+              `La nueva duración (${nuevaDur} min) es mayor que la duración del bloque en ${dia} (${bloque[0]} - ${bloque[1]}).`
+            )
+            setLoading(false)
+            return
+          }
+          if (diff % nuevaDur !== 0) {
+            setError(
+              `La nueva duración (${nuevaDur} min) no encaja exactamente en el bloque en ${dia} (${bloque[0]} - ${bloque[1]}).`
+            )
+            setLoading(false)
+            return
+          }
+        }
+      }
+    }
+
+    // Si pasa la validación, continuamos con la petición al backend
     try {
       const token = localStorage.getItem("token")
       const url = isEditing
         ? `http://localhost:3001/api/service/${servicio._id}`
         : "http://localhost:3001/api/service/create"
-
       const method = isEditing ? "PUT" : "POST"
 
       const response = await fetch(url, {
@@ -136,7 +208,7 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
           titulo: formData.titulo.trim(),
           categoria: formData.categoria,
           precio: Number.parseFloat(formData.precio),
-          duracion: Number.parseInt(formData.duracion),
+          duracion: Number.parseInt(formData.duracion, 10),
           descripcion: formData.descripcion.trim(),
           presencial: formData.presencial,
           disponibilidad: formData.disponibilidad,
@@ -144,12 +216,10 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
       })
 
       const data = await response.json()
-
       if (!response.ok) {
         throw new Error(data.error || `Error al ${isEditing ? "actualizar" : "crear"} el servicio`)
       }
-
-      // Resetear formulario solo si es creación
+      // Resetear formulario solo si es creación (aquí normalmente isEditing=true)
       if (!isEditing) {
         setFormData({
           titulo: "",
@@ -161,8 +231,6 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
           disponibilidad: {},
         })
       }
-
-      // Notificar al componente padre
       onServiceUpdated(data, isEditing)
       onClose()
     } catch (err) {
@@ -185,6 +253,7 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
         </div>
 
         <form onSubmit={handleSubmit} className="service-form">
+          {/* Mensaje de error general */}
           {error && <div className="error-message">{error}</div>}
 
           <div className="form-group">
@@ -219,23 +288,23 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
           </div>
 
           <div className="form-group">
-  <label htmlFor="precio">Precio</label>
-  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-    <span style={{ fontSize: 18, color: '#6c757d', minWidth: 18 }}>$</span>
-    <input
-      type="number"
-      id="precio"
-      name="precio"
-      value={formData.precio}
-      onChange={handleInputChange}
-      placeholder="0"
-      min="0"
-      step="0.01"
-      className="form-input"
-      style={{ flex: 1 }}
-    />
-  </div>
-</div>
+            <label htmlFor="precio">Precio</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 18, color: '#6c757d', minWidth: 18 }}>$</span>
+              <input
+                type="number"
+                id="precio"
+                name="precio"
+                value={formData.precio}
+                onChange={handleInputChange}
+                placeholder="0"
+                min="0"
+                step="0.01"
+                className="form-input"
+                style={{ flex: 1 }}
+              />
+            </div>
+          </div>
 
           <div className="form-group">
             <label htmlFor="duracion">Duración</label>
@@ -254,6 +323,12 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
               ))}
             </select>
           </div>
+          {/* Mostrar advertencia de duración vs bloques existentes */}
+          {duracionWarning && (
+            <div className="warning-message" style={{ marginBottom: '0.5rem' }}>
+              {duracionWarning}
+            </div>
+          )}
 
           <div className="form-group">
             <label htmlFor="descripcion">Descripción del servicio</label>
@@ -309,7 +384,7 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
             <DisponibilidadSelector
               disponibilidad={formData.disponibilidad}
               onChange={handleDisponibilidadChange}
-              duracion={Number.parseInt(formData.duracion) || 60}
+              duracion={Number.parseInt(formData.duracion, 10) || 60}
             />
           )}
 
@@ -328,7 +403,7 @@ const EditarServicioModal = ({ isOpen, onClose, onServiceUpdated, servicio = nul
   )
 }
 
-// Componente para configurar disponibilidad, parece que se hace de forma individual acá, donde se valida cada bloque cada vez que presionas el botón "Agregar"
+// Componente para configurar disponibilidad
 const DisponibilidadSelector = ({ disponibilidad, onChange, duracion }) => {
   const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 
