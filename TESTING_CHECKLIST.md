@@ -76,9 +76,9 @@
 - [X] Estados de reserva se actualizan correctamente
 
 ### Documentos
-- [ ] Subir documento PDF funciona
-- [ ] Cliente puede descargar documento
-- [ ] Eliminar documento funciona
+- [X] Subir documento PDF funciona ** HAY QUE DAR F5 para ver la reserva.. raro.. 
+- [X] Cliente puede descargar documento
+- [X] Eliminar documento funciona
 
 ### Métricas
 - [ ] Estadísticas generales se muestran
@@ -86,7 +86,7 @@
 - [ ] Reseñas de clientes se muestran
 - [ ] Responder a reseñas funciona
 
-## 👤 Funcionalidades de Cliente
+## 👤 Funcionalidades de Cliente - ILAN
 
 ### Búsqueda de Entrenadores
 - [ ] Lista de entrenadores se carga
@@ -116,7 +116,7 @@
 - [ ] Escribir reseña funciona
 - [ ] Descargar documentos compartidos funciona
 
-## 🎨 Interfaz de Usuario
+## 🎨 Interfaz de Usuario - JONA
 
 ### Navegación
 - [ ] Todos los links del navbar funcionan
@@ -136,16 +136,16 @@
 - [ ] Iniciales se muestran cuando no hay avatar
 - [ ] Avatar se muestra en header cuando está logueado
 
-## 🗄️ Base de Datos
+## 🗄️ Base de Datos - JONA
 
 ### Seed Data
-- [ ] Botón "Poblar Base de Datos" funciona
-- [ ] Se crean entrenadores con avatares
-- [ ] Se crean servicios de ejemplo
-- [ ] Se crean estadísticas de ejemplo
+- [X] Botón "Poblar Base de Datos" funciona
+- [X] Se crean entrenadores con avatares
+- [X] Se crean servicios de ejemplo
+- [X] Se crean estadísticas de ejemplo
 - [ ] Solo funciona en desarrollo
 
-## 📧 Sistema de Emails
+## 📧 Sistema de Emails - JONA
 
 ### Notificaciones
 - [ ] Email de registro se envía
@@ -153,14 +153,14 @@
 - [ ] Email de confirmación de reserva se envía
 - [ ] Email de cancelación se envía
 
-## 🔄 Sistema de Estados
+## 🔄 Sistema de Estados - ILAN
 
 ### Reservas
 - [ ] Estados cambian correctamente (Pendiente → Aceptado → Finalizado)
 - [ ] Cron job finaliza reservas automáticamente
 - [ ] Transiciones de estado respetan roles
 
-## ⚡ Performance
+## ⚡ Performance - JONA PLUS
 
 ### Carga
 - [ ] Páginas cargan en menos de 3 segundos
@@ -168,7 +168,7 @@
 - [ ] No hay memory leaks evidentes
 - [ ] Estados de loading se muestran apropiadamente
 
-## 🛡️ Seguridad
+## 🛡️ Seguridad - ILAN
 
 ### Autenticación
 - [ ] Rutas protegidas requieren token
@@ -179,12 +179,12 @@
 
 ## 🐛 Manejo de Errores
 
-### Frontend
+### Frontend - JONA
 - [ ] Errores de red se manejan apropiadamente
 - [ ] Mensajes de error son claros para el usuario
 - [ ] No hay crashes por datos faltantes
 
-### Backend
+### Backend - ILAN
 - [ ] Errores de validación retornan mensajes claros
 - [ ] Errores 500 no exponen información sensible
 - [ ] Rate limiting funciona (si implementado)
