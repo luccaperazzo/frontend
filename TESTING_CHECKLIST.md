@@ -119,22 +119,22 @@
 ## 🎨 Interfaz de Usuario - JONA
 
 ### Navegación
-- [ ] Todos los links del navbar funcionan
-- [ ] Redirecciones automáticas funcionan
-- [ ] Logout funciona y limpia localStorage
+- [X] Todos los links del navbar funcionan
+- [X] Redirecciones automáticas funcionan
+- [X] Logout funciona y limpia localStorage
 - [ ] Rutas protegidas funcionan correctamente
 
 ### Responsive Design
-- [ ] Se ve bien en desktop
+- [X] Se ve bien en desktop
 - [ ] Se ve bien en tablet
 - [ ] Se ve bien en móvil
 
 ### Avatares
-- [ ] Avatares se cargan en LandingPage
-- [ ] Avatares se cargan en BusquedaEntrenadores
-- [ ] Avatares se cargan en PerfilEntrenador
-- [ ] Iniciales se muestran cuando no hay avatar
-- [ ] Avatar se muestra en header cuando está logueado
+- [X] Avatares se cargan en LandingPage -- Hay un problema con el header de carlos lopez
+- [X] Avatares se cargan en BusquedaEntrenadores
+- [X] Avatares se cargan en PerfilEntrenador
+- [X] Iniciales se muestran cuando no hay avatar
+- [X] Avatar se muestra en header cuando está logueado
 
 ## 🗄️ Base de Datos - JONA
 
@@ -143,7 +143,7 @@
 - [X] Se crean entrenadores con avatares
 - [X] Se crean servicios de ejemplo
 - [X] Se crean estadísticas de ejemplo
-- [ ] Solo funciona en desarrollo
+- [?] Solo funciona en desarrollo
 
 ## 📧 Sistema de Emails - JONA
 
@@ -180,9 +180,9 @@
 ## 🐛 Manejo de Errores
 
 ### Frontend - JONA
-- [ ] Errores de red se manejan apropiadamente
+- [X] Errores de red se manejan apropiadamente
 - [ ] Mensajes de error son claros para el usuario
-- [ ] No hay crashes por datos faltantes
+- [X] No hay crashes por datos faltantes
 
 ### Backend - ILAN
 - [ ] Errores de validación retornan mensajes claros
