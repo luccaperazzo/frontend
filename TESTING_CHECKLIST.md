@@ -102,18 +102,18 @@
 - [X] Navegación a detalle de servicio funciona - 
 
 ### Reservas y Pagos
-- [ ] Detalle de servicio se carga correctamente
-- [ ] Calendario muestra disponibilidad
-- [ ] Selección de horario funciona
-- [ ] Integración con Stripe funciona
-- [ ] Pago exitoso crea reserva
+- [X] Detalle de servicio se carga correctamente
+- [X] Calendario muestra disponibilidad
+- [X] Selección de horario funciona
+- [X] Integración con Stripe funciona
+- [X] Pago exitoso crea reserva
 - [ ] Emails de confirmación se envían
 
 ### Mi Espacio Cliente
-- [ ] Lista de sesiones se carga
-- [ ] Cancelar reserva funciona
-- [ ] Ver entrenadores con sesiones completadas
-- [ ] Escribir reseña funciona
+- [X] Lista de sesiones se carga
+- [X] Cancelar reserva funciona
+- [X] Ver entrenadores con sesiones completadas
+- [X] Escribir reseña funciona
 - [ ] Descargar documentos compartidos funciona
 
 ## 🎨 Interfaz de Usuario - JONA

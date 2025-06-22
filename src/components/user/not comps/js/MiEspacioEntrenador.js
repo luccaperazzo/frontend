@@ -235,23 +235,26 @@ export default function MiEspacioEntrenador() {
   }
 
   // — Manejar eliminación de servicio —
-  const handleDeleteService = async (servicioId) => {
-    try {
-      const token = localStorage.getItem("token")
-      const response = await fetch(`http://localhost:3001/api/service/${servicioId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      })
+const handleDeleteService = async (servicioId) => {
+  try {
+    const token = localStorage.getItem("token")
+    const response = await fetch(`http://localhost:3001/api/service/${servicioId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    })
 
-      if (response.ok) {
-        setServicios((prev) => prev.filter((s) => s._id !== servicioId))
-      } else {
-        console.error("Error al eliminar servicio")
-      }
-    } catch (error) {
-      console.error("Error al eliminar servicio:", error)
+    const data = await response.json()
+
+    if (response.ok) {
+      setServicios((prev) => prev.filter((s) => s._id !== servicioId))
+    } else {
+      alert(data.error || "Error al eliminar servicio")
     }
+  } catch (error) {
+    console.error("Error al eliminar servicio:", error)
+    alert("Error de red al intentar eliminar el servicio")
   }
+}
 
   // — Manejar publicar/despublicar servicio —
   const handleTogglePublishService = async (servicioId, currentPublished) => {
