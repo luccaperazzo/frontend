@@ -76,7 +76,7 @@ Create a `.env` file in the frontend root directory:
 
 ```env
 # Backend API URL
-REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_API_URL=http://localhost:3001/api
 
 # Optional: Enable/disable features
 REACT_APP_ENABLE_NOTIFICATIONS=true
