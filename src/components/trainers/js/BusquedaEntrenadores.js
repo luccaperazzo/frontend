@@ -85,12 +85,7 @@ const BusquedaEntrenadores = () => {
     }
     
     const queryString = params.length ? "?" + params.join("&") : "";
-    
-    // 🔧 LOG: Query string construida
-    console.log('🔧 CONSTRUYENDO QUERY:');
-    console.log('  Filtros actuales:', filtros);
-    console.log('  Parámetros válidos:', params);
-    console.log('  Query string final:', queryString);
+
     
     return queryString;
   };
@@ -99,13 +94,15 @@ const BusquedaEntrenadores = () => {
   const [mensajeError, setMensajeError] = useState("");
 
   //Actualiza el estado de entrenadores y loading.
-
   useEffect(() => {
     const fetchEntrenadores = async () => {
       setLoading(true);
       setMensajeError("");
       
       try {
+        // 🧹 Limpiar consola antes de mostrar nuevos logs
+        console.clear();
+        
         // 🎯 LOG: Filtros aplicados
         console.log('🎯 FILTROS APLICADOS:', filtros);
         
