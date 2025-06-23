@@ -53,7 +53,6 @@ const DetalleServicio = () => {
     
     return minDate;
   };
-
   // Básicamente estableces la variable de estado `servicio` con el servicio que obtuviste del backend.
   useEffect(() => {
     if (hasFetched.current) return;       // 🚩 si ya corrimos, salimos
@@ -61,7 +60,22 @@ const DetalleServicio = () => {
 
     const fetchServicio = async () => {
       try {
-        const res = await fetch(`http://localhost:3001/api/service/${id}`);
+        // Obtener token del localStorage si existe
+        const token = localStorage.getItem("token");
+        
+        // Preparar headers, incluir Authorization si hay token
+        const headers = {
+          "Content-Type": "application/json"
+        };
+        
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+        
+        const res = await fetch(`http://localhost:3001/api/service/${id}`, {
+          method: "GET",
+          headers: headers
+        });
         const data = await res.json();
         setServicio(data);
       } catch {
@@ -72,7 +86,7 @@ const DetalleServicio = () => {
     };
 
     fetchServicio();
-  }, [id]);  // Cada vez que clickeas una fecha, se actualiza el estado de fecha y se limpian horarios.
+  }, [id]);// Cada vez que clickeas una fecha, se actualiza el estado de fecha y se limpian horarios.
   useEffect(() => {
     if (!fecha || !servicio) return;
     setLoadingHorarios(true);
