@@ -16,6 +16,42 @@ const ReprogramarModal = ({ isOpen, onClose, reserva, onConfirm }) => {
   const [loadingHorarios, setLoadingHorarios] = useState(false)
   const [loading, setLoading] = useState(false)
 
+  // Calcular fecha mínima en UTC para el calendario
+  const getMinDateUTC = () => {
+    const nowUTC = new Date();
+    // Crear fecha en UTC para hoy
+    const todayUTC = new Date(Date.UTC(
+      nowUTC.getUTCFullYear(),
+      nowUTC.getUTCMonth(),
+      nowUTC.getUTCDate()
+    ));
+    
+    // IMPORTANTE: El DatePicker trabaja en hora local, 
+    // así que necesitamos ajustar para que muestre la fecha correcta
+    const minDate = new Date(
+      todayUTC.getUTCFullYear(),
+      todayUTC.getUTCMonth(),
+      todayUTC.getUTCDate()
+    );
+    
+    return minDate;
+  };
+
+  // Calcular fecha máxima en UTC para el calendario (31 de diciembre de 2025)
+  const getMaxDateUTC = () => {
+    // Último día de 2025 en UTC
+    const maxDateUTC = new Date(Date.UTC(2025, 11, 31)); // 31 de diciembre de 2025
+    
+    // Ajustar para DatePicker (hora local)
+    const maxDate = new Date(
+      maxDateUTC.getUTCFullYear(),
+      maxDateUTC.getUTCMonth(),
+      maxDateUTC.getUTCDate()
+    );
+    
+    return maxDate;
+  };
+
   // Resetear estado cuando se abre/cierra el modal
   useEffect(() => {
     if (isOpen) {
@@ -95,11 +131,26 @@ const ReprogramarModal = ({ isOpen, onClose, reserva, onConfirm }) => {
             {/* Calendario */}
             <div className="calendar-section">
               <h4>Seleccionar nueva fecha</h4>
-              <div className="calendar-container">
-                <DatePicker
+              <div className="calendar-container">                <DatePicker
                   selected={fecha}
-                  onChange={(date) => setFecha(date)}
-                  minDate={new Date()}
+                  onChange={date => {
+                    // IMPORTANTE: Convertir la fecha seleccionada a UTC
+                    if (date) {
+                      // Crear fecha UTC usando los valores de la fecha local seleccionada
+                      const utcDate = new Date(Date.UTC(
+                        date.getFullYear(),
+                        date.getMonth(),
+                        date.getDate(),
+                        12, 0, 0 // Usar mediodía UTC para evitar problemas de zona horaria
+                      ));
+                      setFecha(utcDate);
+                      console.log(`[ReprogramarModal] Fecha seleccionada convertida a UTC: ${utcDate.toISOString()}`);
+                    } else {
+                      setFecha(null);
+                    }
+                  }}
+                  minDate={getMinDateUTC()} // Fecha mínima seleccionable (hoy)
+                  maxDate={getMaxDateUTC()} // Fecha máxima seleccionable (31 dic 2025)
                   dateFormat="dd/MM/yyyy"
                   inline
                   calendarStartDay={1}
@@ -116,20 +167,63 @@ const ReprogramarModal = ({ isOpen, onClose, reserva, onConfirm }) => {
               ) : loadingHorarios ? (
                 <div className="loading-horarios">Cargando horarios...</div>
               ) : horarios.length === 0 ? (
-                <div className="no-horarios">No hay horarios disponibles para la fecha seleccionada</div>
-              ) : (
+                <div className="no-horarios">No hay horarios disponibles para la fecha seleccionada</div>              ) : (
                 <div className="horarios-grid">
-                  {horarios.map((horario, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      className={`horario-btn ${bloqueSeleccionado === horario ? "selected" : ""}`}
-                      onClick={() => setBloqueSeleccionado(horario)}
-                    >
-                      <span className="horario-icon">🕐</span>
-                      {horario.length === 5 ? horario : horario + ":00"}
-                    </button>
-                  ))}
+                  {horarios.map((horario, index) => {
+                    // Verificar si el horario ya pasó en UTC
+                    let disabled = false;
+                    if (fecha) {
+                      // Obtener fecha y hora actual en UTC
+                      const nowUTC = new Date();
+                      const isTodayUTC = // Se calcula si la fecha seleccionada es hoy en UTC
+                        fecha.getUTCFullYear() === nowUTC.getUTCFullYear() &&
+                        fecha.getUTCMonth() === nowUTC.getUTCMonth() &&
+                        fecha.getUTCDate() === nowUTC.getUTCDate();
+
+                      if (isTodayUTC) {
+                        // horario = "HH:mm"
+                        const [hh, mm] = horario.split(":").map(Number);
+                        const bloqueDateUTC = new Date(Date.UTC(
+                          fecha.getUTCFullYear(),
+                          fecha.getUTCMonth(),
+                          fecha.getUTCDate(),
+                          hh,
+                          mm,
+                          0,
+                          0
+                        ));
+                        
+                        if (bloqueDateUTC <= nowUTC) { //Si el horario ya paso en UTC, se marca como deshabilitado
+                          disabled = true;
+                        }
+                        console.log(`[ReprogramarModal] Comparando bloque ${horario} (${bloqueDateUTC.toISOString()}) con ahora (${nowUTC.toISOString()}) - Deshabilitado: ${disabled}`);
+                      }
+                    }
+
+                    return (
+                      <button
+                        key={index}
+                        type="button"
+                        className={`horario-btn ${bloqueSeleccionado === horario ? "selected" : ""} ${disabled ? "disabled" : ""}`}
+                        onClick={() => !disabled && setBloqueSeleccionado(horario)}
+                        disabled={disabled}
+                        title={disabled ? "Este horario ya pasó" : ""}
+                        style={{
+                          backgroundColor: disabled 
+                            ? "#f6f6f6" 
+                            : bloqueSeleccionado === horario 
+                            ? "#e6f0ff" 
+                            : "#fff",
+                          color: disabled ? "#bbb" : "#222",
+                          cursor: disabled ? "not-allowed" : "pointer",
+                          opacity: disabled ? 0.6 : 1
+                        }}
+                      >
+                        <span className="horario-icon">🕐</span>
+                        {horario.length === 5 ? horario : horario + ":00"}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>

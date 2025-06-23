@@ -51,8 +51,26 @@ const DetalleServicio = () => {
     console.log(`Fecha mínima UTC: ${todayUTC.toISOString()}`);
     console.log(`Fecha mínima para DatePicker: ${minDate.toISOString()}`);
     
-    return minDate;
+    return minDate;  };
+
+  // Calcular fecha máxima en UTC para el calendario (31 de diciembre de 2025)
+  const getMaxDateUTC = () => {
+    // Último día de 2025 en UTC
+    const maxDateUTC = new Date(Date.UTC(2025, 11, 31)); // 31 de diciembre de 2025
+    
+    // Ajustar para DatePicker (hora local)
+    const maxDate = new Date(
+      maxDateUTC.getUTCFullYear(),
+      maxDateUTC.getUTCMonth(),
+      maxDateUTC.getUTCDate()
+    );
+    
+    console.log(`Fecha máxima UTC: ${maxDateUTC.toISOString()}`);
+    console.log(`Fecha máxima para DatePicker: ${maxDate.toISOString()}`);
+    
+    return maxDate;
   };
+
   // Básicamente estableces la variable de estado `servicio` con el servicio que obtuviste del backend.
   useEffect(() => {
     if (hasFetched.current) return;       // 🚩 si ya corrimos, salimos
@@ -238,9 +256,9 @@ const DetalleServicio = () => {
                     console.log(`Fecha seleccionada convertida a UTC: ${utcDate.toISOString()}`);
                   } else {
                     setFecha(null);
-                  }
-                }}
+                  }                }}
                 minDate={getMinDateUTC()} // Fecha mínima seleccionable en el calendario
+                maxDate={getMaxDateUTC()} // Fecha máxima seleccionable (31 dic 2025)
                 dateFormat="dd/MM/yyyy"
                 inline
                 calendarStartDay={1}
