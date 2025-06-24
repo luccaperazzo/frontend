@@ -1,7 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
 import "../css/ClientDocumentCard.css" // Asegúrate de tener este CSS para estilos
+
+dayjs.extend(utc)
 
 const ClientDocumentCard = ({ cliente, reservas, onDocumentUploaded }) => {
   const [documents, setDocuments] = useState([])
@@ -286,10 +290,9 @@ const ClientDocumentCard = ({ cliente, reservas, onDocumentUploaded }) => {
                   onChange={(e) => setSelectedReserva(e.target.value)}
                   className="form-select"
                 >
-                  <option value="">Selecciona una reserva</option>
-                  {reservasParaDocumentos.map((reserva) => (
+                  <option value="">Selecciona una reserva</option>                  {reservasParaDocumentos.map((reserva) => (
                     <option key={reserva._id} value={reserva._id}>
-                      {reserva.servicio?.titulo} - {new Date(reserva.fechaInicio).toLocaleDateString()}
+                      {reserva.servicio?.titulo} - {dayjs(reserva.fechaInicio).utc().format('DD/MM/YYYY')}
                     </option>
                   ))}
                 </select>
