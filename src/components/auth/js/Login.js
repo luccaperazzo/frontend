@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import "../css/Login-CSS.css"
 import Layout from "../../layout/js/Layout"
@@ -10,6 +10,26 @@ const Login = () => {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const navigate = useNavigate()
+
+  // Manejar el botón "atrás" del navegador para redirigir a Landing Page
+  useEffect(() => {
+    const handlePopState = (event) => {
+      // Prevenir el comportamiento por defecto y redirigir a landing page
+      event.preventDefault()
+      navigate("/", { replace: true })
+    }
+
+    // Agregar entrada al historial para que el botón atrás funcione
+    window.history.pushState(null, "", window.location.pathname)
+    
+    // Escuchar el evento popstate (botón atrás)
+    window.addEventListener("popstate", handlePopState)
+
+    // Cleanup: remover el event listener cuando el componente se desmonte
+    return () => {
+      window.removeEventListener("popstate", handlePopState)
+    }
+  }, [navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
